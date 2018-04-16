@@ -10,15 +10,27 @@
     <style type="text/css">
         .modalPopup {
         }
+
+                .auto-style18 {
+            text-align: center;
+            height: 22px;
+             font-weight: 700;
+             color: #000099;
+             font-size: large;
+             font-family: "Arial Black"
+         }
+
     </style>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" runat="Server">
     <div class="btn-aligncenter">
         <br/>
-        <asp:Label ID="lblPoints" runat="server" Text="" CssClass="reward-points"></asp:Label>
+        <asp:Label ID="lblPoints" runat="server" Text=""  CssClass="auto-style18"></asp:Label>
+        <br />
         <br/>
-        <asp:Button ID="btnReward" runat="server" Text="Reload Points" CssClass="button" Width="15%" TabIndex="3" />
+        <asp:Button ID="btnReward" runat="server" Text="Reload Points" CssClass="button" TabIndex="3" />
+        <br />
         <br />
   </div>
 
@@ -27,7 +39,7 @@
     <%--<ajaxToolkit:PopupControlExtender ID="popReward" runat="server" TargetControlID ="btnReward" PopupControlID ="pnlReward" Position="Center"></ajaxToolkit:PopupControlExtender>--%>
 
     <div id="SlideIn">
-        <asp:Panel ID="pnlReward" runat="server" CssClass="popup">
+        <asp:Panel ID="pnlReward" runat="server" CssClass="popup" Width ="30%">
 
 
             <p>&nbsp;&nbsp; &nbsp;</p>

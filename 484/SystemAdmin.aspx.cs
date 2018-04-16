@@ -13,164 +13,89 @@ public partial class SystemAdmin : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        HttpContext.Current.Response.AddHeader("Pragma", "no-cache");
-        HttpContext.Current.Response.AddHeader("Expires", "0");
-        HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 
         if (Session["loggedIn"] == null)
         {
             Response.Redirect("default.aspx");
         }
-        switch (Session["Privilege"].ToString())
-        {
-            case "Administrative":
-                switch (Session["DefaultPage"].ToString())
+                if (!Page.IsPostBack)
                 {
-                    case "Homepage":
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-                    case "ProviderInfor":
-                        Response.Redirect("CEO_AddProvider.aspx");
-                        break;
-                    case "EmployeeInfor":
-                        Response.Redirect("CreateEmployee.aspx");
-                        break;
-                    case "ViewReport":
-                        Response.Redirect("Report.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("CEOprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-
+                    GridBind();
                 }
-                break;
-            case "SystemAdmin":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("SytemAdminprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
+        
+}
 
-                }
-                break;
-            case "Employee":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                    case "GetReward":
-                        Response.Redirect("CashOut.aspx");
-                        break;
-                    case "DashBoard":
-                        Response.Redirect("UserDashboard.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("EmployeeProfile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                }
-                break;
-            case "RewardProvider":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("Providerprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                }
-                break;
-            default:
-                lblPoints.Text = "Welcome, " + Session["FirstName"].ToString() + " " + Session["Middle"].ToString() + " " + Session["last"].ToString() + "!";
 
-                break;
-        }
-    }
-                
-
-    protected void btnCommit_Click(object sender, EventArgs e)
+    public void GridBind()
     {
-        SqlConnection con = new SqlConnection();
-        con.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-        con.Open();
-        SqlCommand command = new SqlCommand();
-        command.Connection = con;
-        BusinessEntity business = new BusinessEntity(txtName.Text.Trim(), txtPhoneNumber.Text.Trim(), txtBusinessEmail.Text.Trim());
-        command.CommandText = "select [BusinessEntity].BusinessEntityEmail, Person.PersonEmail from BusinessEntity, person where [BusinessEntityEmail] =@email or Person.personemail=@email";
-        command.Parameters.AddWithValue("@email", txtBusinessEmail.Text.Trim());
-        SqlDataReader reader = command.ExecuteReader();
-        if (reader.HasRows)
-        {
-            Response.Write("<script>alert('BusinessEmail and CEOEmail have already existed in Database')</script>");
-        }
-        else
-        {
-            reader.Close();
-            command.CommandText = "Insert into BusinessEntity ([BusinessEntityName],[PhoneNumber],[BusinessEntityEmail],[LastUpdated],[LastUpdatedBy]) " +
-            "Values(@businessname, @phonenumber, @email, @lastupdated, @lastupdatedby)";
-            command.Parameters.AddWithValue("@businessname", business.getBusinessName());
-            command.Parameters.AddWithValue("@phonenumber", business.getPhoneNumber());
-            command.Parameters.AddWithValue("@lastupdated", DateTime.Now);
-            command.Parameters.AddWithValue("@lastupdatedby", Session["loggedIn"].ToString());
-            command.ExecuteNonQuery();
-            Person employee = new Person(txtFirstName.Text.Trim(), txtLastName.Text.Trim(), txtBusinessEmail.Text.Trim(), "CEO", Convert.ToInt32(Session["BusinessEntityID"].ToString()));
-            command.CommandText = "Insert into Person([FirstName],[LastName],[MI],[PersonEmail],[JobTitle],[Privilege],[Password],[PointsBalance],[Status],[LastUpdated],[LastUpdatedBy],[BusinessEntityID],[loginCount]) " +
-            "Values (@first, @last,@MI, @email, @title, @position,@password, 0, 1, @LU, @LUB,(select Max(BusinessEntityID) from [BusinessEntity]), 0)";
-            command.Parameters.AddWithValue("@first", employee.getFirstName());
-            command.Parameters.AddWithValue("@last", employee.getLastName());
-            command.Parameters.AddWithValue("@title", employee.getEmployeeTitle());
-            command.Parameters.AddWithValue("@position", "Administrative");
-            command.Parameters.AddWithValue("@LU", DateTime.Now);
-            command.Parameters.AddWithValue("@LUB", Session["loggedIn"].ToString());
+        SqlConnection sc = new SqlConnection();
+        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+        sc.Open();
+        SqlCommand fill = new SqlCommand();
+        fill.Connection = sc;
+        fill.CommandText = "select BusinessEntityID, BusinessEntityName,BusinessEntityEmail from BusinessEntity " +
+            "WHERE     BusinessEntityID != 1 and Status = 1 ";
+        SqlDataAdapter adapter = new SqlDataAdapter(fill);
 
-            if (txtMI.Text.Trim() == "")
-            {
-                command.Parameters.AddWithValue("@MI", DBNull.Value);
-            }
-            else
-            {
-                command.Parameters.AddWithValue("@MI", txtMI.Text.Trim());
-            }
-            string password = System.Web.Security.Membership.GeneratePassword(8, 6);
-            string passwordHashNew = SimpleHash.ComputeHash(password, "MD5", null);
-            command.Parameters.AddWithValue("@password", passwordHashNew);
-            command.ExecuteNonQuery();
-            Send_Mail(employee.getEmail(), employee.getEmail(), password);
-            Response.Write("<script>alert('BusinessEntity and CEO created successfully')</script>");
-            txtBusinessEmail.Text = String.Empty;
-            txtFirstName.Text = String.Empty;
-            txtLastName.Text = String.Empty;
-            txtMI.Text = String.Empty;
-            txtName.Text = String.Empty;
-            txtPhoneNumber.Text = String.Empty;
-        }
+        DataSet ds = new DataSet();
+        adapter.Fill(ds);
 
-
-        con.Close();
+        gdvShow.DataSource = ds;
+        gdvShow.DataBind();
+        sc.Close();
+        gdvShow.SelectedIndex = -1;
     }
-    public void Send_Mail(String email, String Name, String Password)
+
+    protected void btnSearch_Click(object sender, EventArgs e)
     {
-        String message = "Dear CEO" + txtName.Text + ": \n";
-        message += "Your account has been created!!\n";
-        message += "Please login with UserName and Password provides below:\n";
-        message += "UserName:  " + Name + "\n PassWord: " + Password + "\n";
-        MailMessage mail = new MailMessage("elkmessage@gmail.com", email, "Your Account Has been Created(DO NOT REPLY)", message);
+        SqlConnection sc = new SqlConnection();
+        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+        sc.Open();
+        SqlCommand fill = new SqlCommand();
+        fill.Connection = sc;
+
+        string companyname = txtCompany.Text;
+        string companyemail = txtemail.Text;
+
+        if ((companyname != null) && (companyemail == null))
+        {
+            fill.CommandText = "select BusinessEntityID, BusinessEntityName,BusinessEntityEmail from BusinessEntity " +
+            "where        (BusinessEntity.BusinessEntityName LIKE + '%'+@name+'%') and BusinessEntityID != 1 and status = 1";
+            fill.Parameters.AddWithValue("@name", companyname);
+        }
+        else if ((companyname == null) && (companyemail != null))
+        {
+            fill.CommandText = "select BusinessEntityID, BusinessEntityName,BusinessEntityEmail from BusinessEntity " +
+            "Where      (BusinessEntity.BusinessEntityEmail LIKE + '%'+@email+'%') and BusinessEntityID != 1 and status = 1";
+            fill.Parameters.AddWithValue("@email", companyemail);
+        }
+        else if ((companyname != null) && (companyemail != null))
+        {
+            fill.CommandText = "select BusinessEntityID, BusinessEntityName,BusinessEntityEmail from BusinessEntity " +
+            "where        (BusinessEntity.BusinessEntityName LIKE + '%'+@name+'%') AND (BusinessEntity.BusinessEntityEmail LIKE + '%'+@email+'%') and BusinessEntityID != 1 and status = 1";
+            fill.Parameters.AddWithValue("@name", companyname);
+            fill.Parameters.AddWithValue("@email", companyemail);
+        }            
+
+        SqlDataAdapter adapter = new SqlDataAdapter(fill);
+        DataSet ds = new DataSet();
+        adapter.Fill(ds);
+        gdvShow.DataSource = ds;
+        gdvShow.DataBind();
+        sc.Close();
+        gdvShow.SelectedIndex = -1;
+    }
+    protected void gdvShow_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        gdvShow.PageIndex = e.NewPageIndex;
+        GridBind();
+    }
+    
+    public void Send_Mail(String email)
+    {
+        String message = "Dear CEO: \n";
+        message += "Your account has been terminated!!\n";
+        MailMessage mail = new MailMessage("elkmessage@gmail.com", email, "Your Account Has been Terminated(DO NOT REPLY)", message);
         SmtpClient client = new SmtpClient();
         client.EnableSsl = true;
         client.Port = 587;
@@ -178,5 +103,119 @@ public partial class SystemAdmin : System.Web.UI.Page
         client.Credentials = new System.Net.NetworkCredential("elkmessage@gmail.com", "javapass");
         client.Host = "smtp.gmail.com";
         client.Send(mail);
+    }
+    protected void gdvShow_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        SqlConnection sc = new SqlConnection();
+        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+        sc.Open();
+        SqlCommand delete = new SqlCommand();
+        delete.Connection = sc;
+        string ID = ((Label)gdvShow.Rows[e.RowIndex].FindControl("lblBusinessEntityID")).Text;
+        string email = ((Label)gdvShow.Rows[e.RowIndex].FindControl("lblBusinessEntityEmail")).Text;
+        delete.CommandText = "UPDATE [dbo].[BusinessEntity] SET [status]=0, [LastUpdated]=@lasted,[LastUpdatedBy]=@updatedby where BusinessEntityID=@ID";
+        delete.Parameters.AddWithValue("@lasted", DateTime.Now.ToShortDateString());
+        delete.Parameters.AddWithValue("@updatedby", Session["loggedIn"]);
+        delete.Parameters.AddWithValue("@ID", Convert.ToInt32(ID));
+        SqlDataAdapter adapter = new SqlDataAdapter(delete);
+        DataSet ds = new DataSet();
+        adapter.Fill(ds);
+        gdvShow.DataSource = ds;
+
+        //delete.CommandText = "UPDATE [dbo].[Person] SET [status]=0 where BusinessEntityID=@ID";
+        //delete.ExecuteNonQuery();
+        //SqlCommand statusChange = new SqlCommand("BusinessEntityStatusChange", sc);
+        //statusChange.CommandType = CommandType.StoredProcedure;
+        //statusChange.Parameters.AddWithValue("@BusinessEntityID", Convert.ToInt32(ID));
+        //statusChange.ExecuteNonQuery();
+        Response.Write("<script>alert('Terminate entity successfully!')</script>");
+        txtCompany.Text = String.Empty;
+        txtemail.Text = String.Empty;
+        sc.Close();
+        GridBind();
+        Send_Mail(email);
+    }
+ 
+    protected void Download(object sender, EventArgs e)
+    {
+        string Money = "SELECT        BusinessEntity.BusinessEntityID, BusinessEntity.BusinessEntityName AS[Company Name],( Person.LastName + isnull(Person.MI, '') + Person.FirstName) AS CEO, BusinessEntity.PhoneNumber as[Contact Number], BusinessEntity.BusinessEntityEmail As Email "+
+   "FROM            BusinessEntity INNER JOIN "+
+    "                        Person ON BusinessEntity.BusinessEntityID = Person.BusinessEntityID "+
+"WHERE(BusinessEntity.Status = 1) AND(Person.JobTitle = 'CEO')";
+
+        ConvertToExcel(CreateDataTable(Money), "Users", "Users Information");
+    }
+    private System.Data.DataTable CreateDataTable(string SQL)
+    {
+        SqlConnection sc = new SqlConnection();
+        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+        sc.Open();
+
+        SqlCommand cmd = new SqlCommand(SQL, sc);
+        SqlDataAdapter da3 = new SqlDataAdapter(cmd);
+        System.Data.DataTable dt = new System.Data.DataTable();
+        da3.Fill(dt);
+        return dt;
+    }
+    private void ConvertToExcel(System.Data.DataTable dt, string Sheetname, String Title)
+    {
+
+        HttpContext.Current.Response.Clear();
+        HttpContext.Current.Response.ClearContent();
+        HttpContext.Current.Response.ClearHeaders();
+        HttpContext.Current.Response.Buffer = true;
+        HttpContext.Current.Response.ContentType = "application/ms-excel";
+        HttpContext.Current.Response.Write(@"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.0 Transitional//EN"">");
+        HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment;filename= " + Sheetname + ".xls");
+
+        HttpContext.Current.Response.Charset = "utf-8";
+        HttpContext.Current.Response.ContentEncoding = System.Text.Encoding.GetEncoding("windows-1250");
+        //sets font
+        HttpContext.Current.Response.Write("<Td colspan='5' style='background-color:Maroon;border:solid 1 #fff;color:#fff;'><B> " + Title + "</B>");
+        HttpContext.Current.Response.Write("<TR> <font style='font-size:12.0pt;font-family:Times New Roman;background-color: #D20B0C;color:#ffffff''> <TR>");
+        HttpContext.Current.Response.Write("<BR><BR><BR>");
+        // sets the table border, cell spacing, border color, font of the text, background, foreground, font height
+        HttpContext.Current.Response.Write("<TR> <Table border='1' bgColor='#ffffff' " +
+              "borderColor='#000000' cellSpacing='5' cellPadding='0' " +
+              "style='font-size:12.0pt; font-family:Calibri; background:white;'> <TR>");
+        //am getting my grid's column headers
+        int columnscount = dt.Columns.Count;
+
+        for (int j = 0; j < columnscount; j++)
+        {      //write in new column 
+               // HttpContext.Current.Response.Write("<TR> <font style = ' font-size:14.opt; background-color: #D20B0C;color:#ffffff'> <TR>");
+               //HttpContext.Current.Response.Write("<TC> <font style='font-size:12.0pt; font-family:Times New Roman;'> <TR>");
+            HttpContext.Current.Response.Write("<Td>");
+            HttpContext.Current.Response.Write("<B>");
+
+            //Get column headers  and make it as bold in excel columns
+            HttpContext.Current.Response.Write(dt.Columns[j].ColumnName.ToString());
+            HttpContext.Current.Response.Write("</B>");
+            HttpContext.Current.Response.Write("</Td>");
+            // HttpContext.Current.Response.Write("</th>");
+        }
+
+        HttpContext.Current.Response.Write("</TR>");
+
+        foreach (DataRow row in dt.Rows)
+        {//write in new row
+            HttpContext.Current.Response.Write("<TR>");
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                HttpContext.Current.Response.Write("<Td>");
+                HttpContext.Current.Response.Write(row[i].ToString());
+                HttpContext.Current.Response.Write("</Td>");
+            }
+
+            HttpContext.Current.Response.Write("</TR>");
+        }
+        HttpContext.Current.Response.Write("</Table>");
+        HttpContext.Current.Response.Write("</font>");
+        HttpContext.Current.Response.Flush();
+        HttpContext.Current.Response.End();
+
+
+
+
     }
 }

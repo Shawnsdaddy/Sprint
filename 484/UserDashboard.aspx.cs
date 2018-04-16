@@ -14,6 +14,7 @@ public partial class UserDashboard : System.Web.UI.Page
 
     private string userName;
     private int id;
+    private int businessid;
     protected void Page_Load(object sender, EventArgs e)
     {
         System.Data.SqlClient.SqlConnection sc = new System.Data.SqlClient.SqlConnection();
@@ -21,101 +22,41 @@ public partial class UserDashboard : System.Web.UI.Page
 
         sc.ConnectionString = connStr;
         sc.Open();
-        HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        HttpContext.Current.Response.AddHeader("Pragma", "no-cache");
-        HttpContext.Current.Response.AddHeader("Expires", "0");
 
 
-        if (Session["loggedIn"] != null)
+        if (Session["loggedIn"] == null)
+        {
+            Response.Redirect("default.aspx");
+        }
+        else
         {
             userName = Session["loggedIn"].ToString();
-        }
-        switch (Session["Privilege"].ToString())
-        {
-            case "Administrative":
-                switch (Session["DefaultPage"].ToString())
+            displayRedeemGrid();
+            displayActivitiesGrid();
+            //display current balance
+            try
+            {
+                int rewardBalance = 0;
+                String selectBalance = "Select PointsBalance from Person where PersonID = @PersonID";
+                SqlCommand balanceSelect = new SqlCommand(selectBalance, sc);
+                balanceSelect.Parameters.AddWithValue("@PersonID", Session["ID"]);
+                rewardBalance = Convert.ToInt32(balanceSelect.ExecuteScalar());
+                balance.Text = "$" + rewardBalance.ToString();
+
+                int activityquantity = 0;
+                String selectCount = "Select COUNT(PointsTransactionID) FROM PeerTransaction WHERE ReceiverID =" + Session["ID"];
+                SqlCommand countSelect = new SqlCommand(selectCount, sc);
+                activityquantity = Convert.ToInt32(countSelect.ExecuteScalar());
+
+                if (activityquantity > 0)
                 {
-                    case "Homepage":
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-                    case "ProviderInfor":
-                        Response.Redirect("CEO_AddProvider.aspx");
-                        break;
-                    case "EmployeeInfor":
-                        Response.Redirect("CreateEmployee.aspx");
-                        break;
-                    case "ViewReport":
-                        Response.Redirect("Report.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("CEOprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-
+                    actquantity.Text = activityquantity.ToString();
                 }
-                break;
-            case "SystemAdmin":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("SytemAdminprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-
-                }
-                break;
-            case "RewardProvider":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("Providerprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                }
-                break;
-            default:
-                displayRedeemGrid();
-                displayActivitiesGrid();
-
-
-                //display current balance
-                try
-                {
-                    int rewardBalance = 0;
-                    String selectBalance = "Select PointsBalance from Person where PersonID = @PersonID";
-                    SqlCommand balanceSelect = new SqlCommand(selectBalance, sc);
-                    balanceSelect.Parameters.AddWithValue("@PersonID", Session["ID"]);
-                    rewardBalance = Convert.ToInt32(balanceSelect.ExecuteScalar());
-                    balance.Text = "$" + rewardBalance.ToString();
-
-                    int activityquantity = 0;
-                    String selectCount = "Select COUNT(PointsTransactionID) FROM PeerTransaction WHERE ReceiverID =" + Session["ID"];
-                    SqlCommand countSelect = new SqlCommand(selectCount, sc);
-                    activityquantity = Convert.ToInt32(countSelect.ExecuteScalar());
-
-                    if (activityquantity > 0)
-                    {
-                        actquantity.Text = activityquantity.ToString();
-                    }
-                }
-                catch (Exception)
-                {
-
-                }
-                break;
-        }
+            }
+            catch (Exception)
+            {
+            }
+        }     
     }
 
     private void displayRedeemGrid()
@@ -123,6 +64,7 @@ public partial class UserDashboard : System.Web.UI.Page
         if (Session["ID"] != null)
         {
             id = Convert.ToInt32(Session["ID"]);
+            businessid = Convert.ToInt32(Session["BusinessEntityID"]);
         }
         if (Session["loggedIn"] != null)
         {
@@ -134,9 +76,10 @@ public partial class UserDashboard : System.Web.UI.Page
         sc.Open();
 
         SqlCommand cmd = new SqlCommand();
-        cmd.CommandText = "SELECT CONVERT(VARCHAR(10), cast(RedeemTransaction.RedeemDate as date), 101) as Date,  format(RedeemTransaction.RedeemAmount, 'C', 'en-us') as Amount, RedeemTransaction.RedeemQuantity as Quantity, Provider.JobTitle as Company FROM Person as Person1, Person as Provider, RedeemTransaction where Provider.PersonID = RedeemTransaction.ProviderID AND Person1.PersonID = RedeemTransaction.PersonID and Person1.PersonID = @PersonID order by RedeemTransaction.RedeemDate desc";
+        cmd.CommandText = "SELECT CONVERT(VARCHAR(10), cast(RedeemTransaction.RedeemDate as date), 101) as Date,  format(ProviderRewards.GiftCardAmount, 'C', 'en-us') as Amount, RedeemTransaction.RedeemQuantity as Quantity, RewardProvider.ProviderName as Company FROM RedeemTransaction INNER JOIN ProviderRewards ON RedeemTransaction.GiftCardID= ProviderRewards.GiftCardID INNER JOIN RewardProvider ON ProviderRewards.ProviderID = RewardProvider.ProviderID WHERE PersonID =  @PersonID AND BusinessEntityID = @BusinessEntityID order by RedeemTransaction.RedeemDate desc";
         //SqlCommand rewardsGrid = new SqlCommand(MyRedeem, sc);
         cmd.Parameters.AddWithValue("@PersonID", id);
+        cmd.Parameters.AddWithValue("@BusinessEntityID", businessid);
         //rewardsGrid.Connection = sc;
         //SqlDataReader reader2 = rewardsGrid.ExecuteReader();
         cmd.Connection = sc;

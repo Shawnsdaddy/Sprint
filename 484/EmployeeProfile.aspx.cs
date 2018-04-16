@@ -10,6 +10,8 @@ using System.IO;
 using System.Net.Mail;
 using System.Configuration;
 
+
+
 public partial class employeeProfile : System.Web.UI.Page
 {
 
@@ -18,6 +20,8 @@ public partial class employeeProfile : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+      
+
         HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         HttpContext.Current.Response.AddHeader("Pragma", "no-cache");
         HttpContext.Current.Response.AddHeader("Expires", "0");
@@ -26,62 +30,6 @@ public partial class employeeProfile : System.Web.UI.Page
         {
             Response.Redirect("default.aspx");
         }
-        switch (Session["Privilege"].ToString())
-        {
-            case "Administrative":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-                    case "ProviderInfor":
-                        Response.Redirect("CEO_AddProvider.aspx");
-                        break;
-                    case "EmployeeInfor":
-                        Response.Redirect("CreateEmployee.aspx");
-                        break;
-                    case "ViewReport":
-                        Response.Redirect("Report.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("CEOprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-
-                }
-                break;
-            case "SystemAdmin":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("SytemAdminprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-
-                }
-                break;
-            case "RewardProvider":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("Providerprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                }
-                break;
-            default:
                 string name = Session["FirstName"].ToString() + " " + Session["middle"].ToString() + " " + Session["Last"].ToString();
                 lblFullName.Text = name;
                 lblName.Text = name + "'s Profile";
@@ -115,8 +63,8 @@ public partial class employeeProfile : System.Web.UI.Page
                     }
                     sc.Close();
                 }
-                break;
-        }
+               
+        
 
         
     }
@@ -124,7 +72,7 @@ public partial class employeeProfile : System.Web.UI.Page
     protected void btnChangePassword_Click(object sender, EventArgs e)
     {
 
-
+        
         String oldpass = Session["Password"].ToString();
         if (oldpass == txtOldPass.Text.Trim())
         {
@@ -175,11 +123,11 @@ public partial class employeeProfile : System.Web.UI.Page
             //else
             //{
             //    reader.Close();
-                insert.CommandText = "UPDATE [dbo].[Person] SET [FirstName] = @FirstName,[LastName] = @LastName,[MI] = @MI, [LastUpdated] = @LastUpdated,[LastUpdatedBy] = @LastUpdatedBy WHERE PersonID=" +
+                insert.CommandText = "UPDATE [dbo].[Person] SET [FirstName] = @FirstName,[LastName] = @LastName,[MI] = @MI,[NickName] = @nickname, [LastUpdated] = @LastUpdated,[LastUpdatedBy] = @LastUpdatedBy WHERE PersonID=" +
                     "@ID";
                 insert.Parameters.AddWithValue("@FirstName", txtFirstName.Text);
                 insert.Parameters.AddWithValue("@LastName", txtLastName.Text);
-                insert.Parameters.AddWithValue("@nickname", txtNickName.Text);
+                
                 insert.Parameters.AddWithValue("@ID", Session["ID"]);
                 insert.Parameters.AddWithValue("@LastUpdatedBy", Session["loggedIn"].ToString());
                 insert.Parameters.AddWithValue("@LastUpdated", DateTime.Now.ToShortDateString());
@@ -195,14 +143,18 @@ public partial class employeeProfile : System.Web.UI.Page
                     Session["middle"] = txtMI.Text.Trim();
                 }
 
-                //if (txtManagerID.Text.Trim() == "")
-                //{
-                //    insert.Parameters.AddWithValue("@ManagerID", DBNull.Value);
-                //}
-                //else
-                //{
-                //    insert.Parameters.AddWithValue("@ManagerID", txtManagerID.Text.Trim());
-                //}
+                if (txtNickName.Text.Trim() == "")
+                {
+                    insert.Parameters.AddWithValue("@nickname", DBNull.Value);
+                    Session["NickName"] ="";
+                }
+                else
+                {
+                    insert.Parameters.AddWithValue("@nickname", txtNickName.Text);
+                    Session["NickName"]= txtNickName.Text.Trim();
+                }
+
+
                 Session["FirstName"] = txtFirstName.Text.Trim();
                 Session["Last"] = txtLastName.Text.Trim();
                 insert.ExecuteNonQuery();
@@ -210,7 +162,7 @@ public partial class employeeProfile : System.Web.UI.Page
                 Master.Updatelable = name;
                 lblFullName.Text = name;
                 lblName.Text = name + "'s Profile";
-            Session["NickName"]= txtNickName.Text.Trim();
+
             lblNick.Text = Session["NickName"].ToString();
                 insert.ExecuteNonQuery();
             Response.Write("<script>alert(' Employee Information has been updated!')</script>");

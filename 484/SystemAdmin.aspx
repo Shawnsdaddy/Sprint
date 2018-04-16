@@ -2,113 +2,254 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <style>
-        .Table {
-                font-family: 'Raleway', sans-serif;
-    margin-top: 3%;
-    margin-bottom: auto;
-    margin-left: 34%;
-    margin-right: 10%;
+         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .btn {
+            color: #fff;
+            background-color: #17468A;
+            border-color: #17468A;
+            width: 20%;
+            height: 30px;
+            font-weight: normal;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            border: 1px solid transparent;
+            font-size: 1rem;
+            line-height: 1.25;
+            border-radius: 0.25rem;
+            transition: all 0.15s ease-in-out;
+            position: relative;
+            float: left;
+        }
+
+        .mybutton {
+            border-width: 0;
+            border-style: none;
+            background-color: #B3C100;
+            font-weight: bold;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: medium;
+            color: white;
+        }
+
+        .header {
+            background-color: #B3C100;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            border: none 0px transparent;
+            height: 25px;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .rows {
+            background-color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 15px;
+            color: #000;
+            height: 50px;
+            text-align: center;
+            border: none 0px transparent;
+        }
+
+        .pager {
+            background-color: #B3C100;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            height: 30px;
+            text-align: center;
+        }
+
+        .mydatagrid
+        {
+           border:1px solid #fff
+        }
+         .rounded-corners
+        {
+            border: 1px solid #fff;
+            -webkit-border-radius: 8px;
+            -moz-border-radius: 8px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header{
+            background-color: #B3C100;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            border: none 0px transparent;
+            height: 25px;
+            text-align: center;
+            font-size: 20px;           
+        }
+        .rows{
+            background-color: #fff;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 15px;
+            color: #000;
+            min-height: 25px;
+            text-align: center;
+            border: none 0px transparent;
+        }
+        .rows:hover{
+            background-color: #EAEDED;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #666262;
+            text-align: center;
+        }
+        .selectedrow{
+            background-color: #EAEDED;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: bold;
+            text-align: center;
+        }
+        .mydatagrid{
+            background-color: white;
+            padding: 5px 5px 5px 5px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .mydatafrid a:hover{
+            background-color: #000;
+            color: #566573;
+        }
+        .mydatagrid span{
+            background-color: #bece02;
+            color: #000;
+            padding: 5px 5px 5px 5px;
+
+        }
+        .pager{
+            background-color: #B3C100;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            height: 30px;
+            text-align: center;
+
+        }
+        .mydatagrid td{
+            padding: 5px;
+        }
+        .mydatagrid th{
+            padding: 5px;
+        }
+        .auto-style2 {
+            margin-left: 116px;
         }
     </style>
+    <br />
+    <h2><asp:Label runat="server" Text="Terminate Users" ID="lblTitle" CssClass="reward-points" Width="30%" Font-Size="X-Large" ForeColor="#17468A"></asp:Label></h2>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" runat="Server">
     <div class="btn-aligncenter">
-        <br/>
-        <asp:Label ID="lblPoints" runat="server" Text="" CssClass="reward-points" Font-Size="X-Large" ></asp:Label>
-
   </div>
 
-    <div style="text-align:center;font-size:medium; width:90%; height:90%; margin-left:60px; float:left;">
+    <div style="text-align:center;font-size:medium; width:77%; height:100%;margin-left:10%">
         <br />
-
-        <asp:Table ID="EditProfile" runat="server" CssClass="Table" Width="90%" Height="50%">
-            <asp:TableHeaderRow>
-                <asp:TableCell ColumnSpan="2">
-                    <asp:Label ID="Label1" runat="server" class="auto-style1" Text="Business Information" Font-Underline="true" Font-Size="Large" Font-Bold="true"></asp:Label>
-                </asp:TableCell>
-            </asp:TableHeaderRow>
+        <asp:Table ID="Table1" runat="server" CellPadding="3" CellSpacing="5" HorizontalAlign ="Center">
             <asp:TableRow>
                 <asp:TableCell>
-                    <asp:Label ID="lblName" runat="server" class="auto-style1" Text="Business Name:"></asp:Label>
+                    <asp:Label ID="lblCompany" runat="server" Text="Search by Name"></asp:Label>
+                </asp:TableCell>
+                <asp:TableCell></asp:TableCell>
+                <asp:TableCell>
+                    <asp:Label ID="lblemail" runat="server" Text="Search by E-mail"></asp:Label>
+                </asp:TableCell>
+            </asp:TableRow>
+            <asp:TableRow>
+                <asp:TableCell>
+                    <asp:TextBox ID="txtCompany" runat="server" Width="180px"></asp:TextBox>
                 </asp:TableCell>
                 <asp:TableCell>
-                    <asp:TextBox ID="txtName" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                    <asp:RequiredFieldValidator ID="NameRequire" ValidationGroup="profile" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtName" ErrorMessage="*"></asp:RequiredFieldValidator>
-                </asp:TableCell><asp:TableCell>
-                    <asp:RegularExpressionValidator ValidationGroup="profile" ID="FirstNameMessage" runat="server" ForeColor="Red" ControlToValidate="txtName" ValidationExpression="^[a-zA-Z\s']{1,30}$" Text="No more than 30 alphabetic characters" />
-                </asp:TableCell></asp:TableRow><asp:TableRow>
+                    <asp:Label ID="Label1" runat="server" Text="or" ForeColor="LightGray"></asp:Label>
+                </asp:TableCell>
                 <asp:TableCell>
-                    <asp:Label ID="lblBusinessEmail" runat="server" class="auto-style1" Text="Email:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:TextBox ID="txtBusinessEmail" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                    <asp:RequiredFieldValidator ID="Required" ValidationGroup="profile" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtBusinessEmail" ErrorMessage="*"></asp:RequiredFieldValidator>
-                </asp:TableCell><asp:TableCell>
-                    
-                    <asp:RegularExpressionValidator ValidationGroup="profile" ID="RegularExpressionValidator1" runat="server" ForeColor="Red"
-                        ControlToValidate="txtBusinessEmail" ErrorMessage="Please enter corect email. For example john@example.com"
-                        ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>                   
-                </asp:TableCell></asp:TableRow><asp:TableRow>
+                    <asp:TextBox ID="txtemail" runat="server" Width="180px" ></asp:TextBox>
+                </asp:TableCell>
                 <asp:TableCell>
-                    <asp:Label ID="lblPhoneNumber" runat="server" class="auto-style1" Text="Contact Number:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:TextBox ID="txtPhoneNumber" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ValidationGroup="profile" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtPhoneNumber" ErrorMessage="*"></asp:RequiredFieldValidator>
-                </asp:TableCell><asp:TableCell>
-                    <asp:RegularExpressionValidator ValidationGroup="profile" ID="RegularExpressionValidator2" runat="server" ForeColor="Red" ControlToValidate="txtPhoneNumber" ValidationExpression="[0-9]{10}" Text="Enter correct phone number, eg. xxxxxxxxxx" />
-                </asp:TableCell></asp:TableRow><asp:TableHeaderRow>
-                <asp:TableCell ColumnSpan="2">
-                    <asp:Label ID="Label2" runat="server" class="auto-style1" Text="CEO Information" Font-Underline="true" Font-Size="Large" Font-Bold="true"></asp:Label>
-                </asp:TableCell></asp:TableHeaderRow><asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="lblFirstName" runat="server" class="auto-style1" Text="First Name:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:TextBox ID="txtFirstName" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ValidationGroup="profile" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtFirstName" ErrorMessage="*"></asp:RequiredFieldValidator>
-                </asp:TableCell><asp:TableCell>
-                    
-                    <asp:RegularExpressionValidator ValidationGroup="profile" ID="RegularExpressionValidator3" runat="server" ForeColor="Red" ControlToValidate="txtFirstName" ValidationExpression="^[a-zA-Z\s']{1,20}$" Text="No more than 20 alphabetic characters" />
-                </asp:TableCell></asp:TableRow><asp:TableRow>
 
+                </asp:TableCell>
                 <asp:TableCell>
-                    <asp:Label ID="lblMI" runat="server" Text="Middle Initial:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:TextBox ID="txtMI" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                </asp:TableCell><asp:TableCell>
-                    <asp:RegularExpressionValidator ValidationGroup="profile" ID="MIMessage" ForeColor="Red" runat="server" ControlToValidate="txtMI" ValidationExpression="^[a-zA-Z\s']{0,1}$" Text="One alphabetic characters" />
-                </asp:TableCell></asp:TableRow><asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="lblLastName" runat="server" class="auto-style1" Text="Last Name:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:TextBox ID="txtLastName" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                    <asp:RequiredFieldValidator ID="RequireddValidator1" ValidationGroup="profile" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtLastName" ErrorMessage="*"></asp:RequiredFieldValidator>
-                </asp:TableCell><asp:TableCell>
-                    
-                    <asp:RegularExpressionValidator ValidationGroup="profile" ID="LastNameMessage" runat="server" ForeColor="Red" ControlToValidate="txtLastName" ValidationExpression="^[a-zA-Z\s']{1,20}$" Text="No more than 20 alphabetic characters" />
-                </asp:TableCell></asp:TableRow><%--<asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="lblTitle" runat="server" class="auto-style1" Text="Job Title:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                     <asp:DropDownList ID="ddlJob" runat="server" Width="200px" CssClass="textbox">
-                    <asp:ListItem Value="0">Choose a Title</asp:ListItem>
-                    <asp:ListItem Value="1">CEO</asp:ListItem>
-                </asp:DropDownList>
-                    <asp:CompareValidator ID="reqJob" runat="server" ControlToValidate="ddlJob" ErrorMessage="*" ForeColor="Red"
-                                ValueToCompare="0" Operator="NotEqual" ValidationGroup="profile"></asp:CompareValidator>
-                </asp:TableCell></asp:TableRow><asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="lblPosition" runat="server" class="auto-style1" Text="Position:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                     <asp:DropDownList ID="ddlPosition" runat="server" Width="200px" CssClass="textbox">
-                    <asp:ListItem Value="0">Choose a Position</asp:ListItem>
-                    <asp:ListItem Value="1">Administrative</asp:ListItem>
-                </asp:DropDownList>
-                    <asp:CompareValidator ID="CompareValidator1" runat="server" ControlToValidate="ddlPosition" ErrorMessage="*" ForeColor="Red"
-                                ValueToCompare="0" Operator="NotEqual" ValidationGroup="profile"></asp:CompareValidator>
-                </asp:TableCell></asp:TableRow>--%><asp:TableFooterRow>
-                    <asp:TableCell></asp:TableCell><asp:TableCell>
-                    <asp:Button ID="btnCommit" runat="server" class="button" Text="Commit" Width="50%" ValidationGroup="profile" OnClick="btnCommit_Click"></asp:Button>
-                </asp:TableCell></asp:TableFooterRow></asp:Table></div>
-    
-</asp:Content>
+                    <asp:Button ID="btnSearch" runat="server" Text="Search" Width="150px" CssClass="btn" OnClick="btnSearch_Click" />
+                </asp:TableCell>
+            </asp:TableRow>
+        </asp:Table>
+        <br />
+        <br />
+        <div style="float: left; width: 80%;margin-left:5%">
+            <asp:GridView ID="gdvShow" HorizontalAlign="Center" ForeColor="#333333" runat="server" CellPadding="3" GridLines="None" AutoGenerateColumns="False" AllowPaging ="True" OnPageIndexChanging ="gdvShow_PageIndexChanging" DataKeyNames="BusinessEntityID" CellSpacing="1" Width="64%" OnRowDeleting="gdvShow_RowDeleting" style="margin-left: 12%" >
+               <AlternatingRowStyle BackColor="White" ForeColor="#284775" CssClass="rows" />
+                <Columns>
+                <asp:TemplateField HeaderText="BusinessEntityID">
+                    <%--<EditItemTemplate>
+                        <asp:Label ID="lbleditPID" runat="server" Text='<%# Eval("ProjectID") %>'></asp:Label>
+                    </EditItemTemplate>--%>
+                    <ItemTemplate>
+                        <asp:Label ID="lblBusinessEntityID" runat="server" Text='<%# Eval("BusinessEntityID") %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="BusinessEntityName">
+                    <%--<EditItemTemplate>
+                        <asp:TextBox ID="txteditPName" runat="server" Text='<%# Eval("ProjectName") %>'></asp:TextBox>
+                    </EditItemTemplate>--%>
+                    <ItemTemplate>
+                        <asp:Label ID="lblBusinessEntityName" runat="server" Text='<%# Eval("BusinessEntityName") %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="BusinessEntityEmail">
+                    <%--<EditItemTemplate>
+                        <asp:TextBox ID="txtEditPDes" runat="server" Text='<%# Eval("ProjectDescription") %>'></asp:TextBox>
+                    </EditItemTemplate>--%>
+                    <ItemTemplate>
+                        <asp:Label ID="lblBusinessEntityEmail" runat="server" Text='<%# Eval("BusinessEntityEmail") %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                     <asp:CommandField DeleteText="Terminate" ShowDeleteButton="True" />
+                </Columns>
+                <%--<Columns>
+                    <asp:BoundField DataField="BusinessEntityID" HeaderText="BusinessEntityID" SortExpression="BusinessEntityID" InsertVisible="False" ReadOnly="True" />
+                    <asp:BoundField DataField="BusinessEntityName" HeaderText="BusinessEntityName" SortExpression="BusinessEntityName" />                    
+                    <asp:BoundField DataField="BusinessEntityEmail" HeaderText="BusinessEntityEmail" SortExpression="BusinessEntityEmail" />
+                    <asp:CommandField DeleteText="Terminate" ShowDeleteButton="True" />
+                </Columns>--%>
+                 <EditRowStyle BackColor="#999999" />
+                 <EmptyDataTemplate>No Record Found</EmptyDataTemplate>  
+                <EmptyDataRowStyle ForeColor ="#999999" HorizontalAlign="Center" />
+                <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                <RowStyle BackColor="#F7F6F3" ForeColor="#333333" CssClass="rows" />
+                <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+                <SortedAscendingCellStyle BackColor="#E9E7E2" />
+                <SortedAscendingHeaderStyle BackColor="#506C8C" />
+                <SortedDescendingCellStyle BackColor="#FFFDF8" />
+                <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
 
+            </asp:GridView>
+        </div>
+            <div >
+            <asp:Table ID="Table2" runat="server" CaptionAlign="Left" CellPadding="10" CellSpacing="5" CssClass="auto-style2" Width="423px">
+                <asp:TableRow>
+                    <asp:TableCell>
+                     <asp:Image ID="Image2" runat="server" ImageUrl="~/image/Excel.jpg" Height="66px" Width="77px" />
+                         </asp:TableCell>
+                    <asp:TableCell>
+                    <asp:LinkButton ID="User" runat="server" OnClick="Download">Download Users</asp:LinkButton>
+                    </asp:TableCell>
+                   
+
+                </asp:TableRow>
+            </asp:Table>
+             
+        
+        </div>
+    </div>
+    </asp:Content>

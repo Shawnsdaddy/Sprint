@@ -12,11 +12,14 @@ using System.Configuration;
 
 //using Microsoft.Office.Interop.Excel;
 using System.Web.UI.DataVisualization.Charting;
+//using OfficeOpenXml;
 
 public partial class Test : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
+       // Response.Redirect("test.aspx");
+
         HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         HttpContext.Current.Response.AddHeader("Pragma", "no-cache");
         HttpContext.Current.Response.AddHeader("Expires", "0");
@@ -24,103 +27,58 @@ public partial class Test : System.Web.UI.Page
         {
             Response.Redirect("default.aspx");
         }
-        switch (Session["Privilege"].ToString())
+        switch (Session["BusinessEntityID"].ToString())
         {
-            case "Employee":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                    case "GetReward":
-                        Response.Redirect("CashOut.aspx");
-                        break;
-                    case "DashBoard":
-                        Response.Redirect("UserDashboard.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("EmployeeProfile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                }
+            case "2":
+                Tableau.Attributes.Add("src", "https://us-east-1.online.tableau.com/t/jingyi/views/Business2CEOReport/Story1?iframeSizedToWindow=true&:embed=y&:showAppBanner=false&:display_count=no&:showVizHome=no");
                 break;
-            case "SystemAdmin":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("SytemAdminprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-
-                }
+            case "4":
+                Tableau.Attributes.Add("src", "https://us-east-1.online.tableau.com/t/jingyi/views/Business4CEOReport/Story1?iframeSizedToWindow=true&:embed=y&:showAppBanner=false&:display_count=no&:showVizHome=no");
                 break;
-            case "RewardProvider":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("Providerprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                }
-                break;
-            default:
-                break;
-        }
+        }     
     }
     protected void EmployeeSheet(object sender, EventArgs e)
     {
-        string employee = "SELECT  BusinessEntity.BusinessEntityName, Person.PersonID, Person.FirstName, Person.LastName," +
-            " isnull(Person.MI,'') as MI, Person.NickName, Person.PointsBalance, Person.JobTitle, " +
-            "COUNT(PeerTransaction.PointsTransactionID) AS [Rewarded Times], Value.ValueName FROM BusinessEntity " +
-            "INNER JOIN Person ON BusinessEntity.BusinessEntityID = Person.BusinessEntityID INNER JOIN PeerTransaction " +
-            "ON Person.PersonID = PeerTransaction.ReceiverID INNER JOIN Value ON PeerTransaction.ValueID = Value.ValueID " +
-            "where Person.Privilege ='Employee' and Person.BusinessEntityID = " + Session["BusinessEntityID"].ToString() +" GROUP BY BusinessEntity.BusinessEntityName, Person.PersonID, Person.FirstName, " +
-            "Person.LastName, Person.MI, Person.NickName, Person.PointsBalance, Person.JobTitle, Value.ValueName";
+        string employee = "SELECT Person.NickName, Person.FirstName, Person.LastName, Person.MI, Person.PersonEmail, " +
+            "Person.JobTitle, COUNT(PeerTransaction.PointsTransactionID) AS [Total Rewarded Times], MAX(Value.ValueName) AS [Top Value Rewarded] " +
+            "FROM Person INNER JOIN PeerTransaction ON Person.PersonID = PeerTransaction.ReceiverID INNER JOIN Value ON " +
+            "PeerTransaction.ValueID = Value.ValueID where Person.BusinessEntityID = " + Session["BusinessEntityID"].ToString() + " GROUP BY Person.NickName, Person.FirstName, Person.LastName, Person.MI, " +
+            "Person.PersonEmail, Person.JobTitle, Person.Privilege HAVING (Person.Privilege = 'Employee')";
 
 
 
-         ConvertToExcel(CreateDataTable(employee), "Employee Sheet", ValueGraph);
+        ConvertToExcel(CreateDataTable(employee), "Employee Sheet","Employee Information");
 
 
     }
     protected void RewardProviderSheet(object sender, EventArgs e)
     {
-        string RewardProvider = "SELECT Person.PersonID AS [Reward Provider ID], Person.JobTitle AS [Provider Name], " +
-            "Person.PersonEmail AS [Provider Email], ProviderAmount.TypeOfBusiness AS [Business Type], " +
-            " ProviderAmount.Amount AS [Gift Card Amount], SUM(RedeemTransaction.RedeemAmount * RedeemTransaction.RedeemQuantity) AS TotalCashOut," +
-            " ProviderAmount.LastUpdate, ProviderAmount.LastUpdateBy FROM Person INNER JOIN ProviderAmount ON Person.PersonID =" +
-            " ProviderAmount.ProviderID INNER JOIN RedeemTransaction ON Person.PersonID = RedeemTransaction.ProviderID WHERE " +
-            "(Person.Status = 1) AND (Person.BusinessEntityID = " + Session["BusinessEntityID"].ToString() + ") GROUP BY Person.PersonID, Person.JobTitle, Person.PersonEmail," +
-            " ProviderAmount.TypeOfBusiness, ProviderAmount.Amount, ProviderAmount.LastUpdate, ProviderAmount.LastUpdateBy";
+        string RewardProvider = "SELECT        RewardProvider.ProviderName, RewardProvider.TypeOfBusiness, ProviderRewards.GiftCardAmount, COUNT(RedeemTransaction.RedeemTransactionID) AS [Rewarded Time], "+
+                         "ABS(SUM(RedeemTransaction.TotalAmount)) AS[Total Redeemption Amount] "+
+"FROM RedeemTransaction INNER JOIN "+
+ "                        ProviderRewards ON RedeemTransaction.GiftCardID = ProviderRewards.GiftCardID INNER JOIN "+
+   "                      RewardProvider ON ProviderRewards.ProviderID = RewardProvider.ProviderID "+
+"GROUP BY RewardProvider.ProviderName, RewardProvider.TypeOfBusiness, RewardProvider.Status, ProviderRewards.GiftCardAmount, ProviderRewards.BusinessEntityID "+
+"HAVING(RewardProvider.Status = 1) AND(ProviderRewards.BusinessEntityID = "+ Session["BusinessEntityID"].ToString()+" )";
 
 
-        ConvertToExcel(CreateDataTable(RewardProvider), "Reward Provider Sheet", ProviderPerformance);
+        ConvertToExcel(CreateDataTable(RewardProvider), "Reward Provider Sheet","Reward Provider Performance");
 
     }
     protected void PeerRewardHistorySheet(object sender, EventArgs e)
     {
-       
 
-        string RewardHistpry = "SELECT ISNULL(Person.FirstName, '') + ' ' + ISNULL(Person.MI, '') + ' ' + ISNULL(Person.LastName, '') AS [Receiver Name]," +
-            " ISNULL(Person_1.FirstName, '') + ' ' + ISNULL(Person_1.MI, '') + ' ' + ISNULL(Person_1.LastName, '') AS [Rewarder Name]," +
-            "PeerTransaction.PointsAmount, Category.CategoryName, Value.ValueName,  PeerTransaction.EventDescription, " +
-            "PeerTransaction.RewardDate FROM  Person INNER JOIN PeerTransaction ON Person.PersonID = PeerTransaction.ReceiverID INNER JOIN " +
-            "Value ON PeerTransaction.ValueID = Value.ValueID INNER JOIN Category ON PeerTransaction.CategoryID = Category.CategoryID INNER JOIN" +
-            " Person AS Person_1 ON PeerTransaction.RewarderID = Person_1.PersonID where Person.BusinessEntityID = " + Session["BusinessEntityID"].ToString() + "Order By PeerTransaction.RewardDate";
 
-        ConvertToExcel(CreateDataTable(RewardHistpry), "Peer Reward History Sheet", EmployeePerformance);
+        string RewardHistpry = "SELECT        Person_1.LastName + ISNULL(Person_1.MI, '') + Person_1.FirstName AS [Employee (Rewarder)], Person.LastName + ISNULL(Person.MI, '') + Person.FirstName AS [Employee (Receiver)], "+
+                         "PeerTransaction.PointsAmount AS Points, Value.ValueName, Category.CategoryName, PeerTransaction.EventDescription, PeerTransaction.LastUpdated "+
+"FROM            PeerTransaction INNER JOIN "+
+ "                        Person ON PeerTransaction.ReceiverID = Person.PersonID INNER JOIN "+
+  "                       Value ON PeerTransaction.ValueID = Value.ValueID INNER JOIN "+
+   "                      Person AS Person_1 ON PeerTransaction.RewarderID = Person_1.PersonID INNER JOIN "+
+    "                     Category ON PeerTransaction.CategoryID = Category.CategoryID "+
+"WHERE(Person.BusinessEntityID = "+ Session["BusinessEntityID"].ToString()+")";
+
+        ConvertToExcel(CreateDataTable(RewardHistpry), "Peer Reward History Sheet","Peer Reward History");
 
 
 
@@ -130,12 +88,13 @@ public partial class Test : System.Web.UI.Page
 
     protected void MoneyTransactionSheet(object sender, EventArgs e)
     {
-        string Money = "SELECT MoneyTransaction.MoneyTransactionID,isnull( Person.FirstName,'')+' '+isnull( Person.MI,'')+' '+isnull( Person.LastName,'') As Name," +
-            " Person.NickName, MoneyTransaction.TransactionAmount, MoneyTransaction.TotalAmount as [Amount in the Pool], " +
-            " MoneyTransaction.LastUpdated as Date, MoneyTransaction.TransactionType FROM Person INNER JOIN MoneyTransaction ON Person.PersonID = MoneyTransaction.PersonID " +
-            "where Person.BusinessEntityID=" + Session["BusinessEntityID"].ToString();
+        string Money = "SELECT        MoneyTransaction.MoneyTransactionID, Person.LastName + ISNULL(Person.MI, '') + Person.FirstName AS Employee, Person.JobTitle, MoneyTransaction.TransactionAmount, MoneyTransaction.TransactionType, "+
+                         "MoneyTransaction.TotalAmount AS[Total Amount in the Pool] "+
+"FROM MoneyTransaction INNER JOIN "+
+                         "Person ON MoneyTransaction.PersonID = Person.PersonID "+
+"WHERE(Person.BusinessEntityID = "+ Session["BusinessEntityID"].ToString()+")";
 
-        ConvertToExcel(CreateDataTable(Money), "Money Transaction Sheet", MoneyTrendChart);
+        ConvertToExcel(CreateDataTable(Money), "Money Transaction Sheet","Money Pool");
 
     }
 
@@ -153,7 +112,7 @@ public partial class Test : System.Web.UI.Page
     }
 
 
-    private void ConvertToExcel(System.Data.DataTable dt, string Sheetname, Chart chartID)
+    private void ConvertToExcel(System.Data.DataTable dt, string Sheetname,String Title)
     {
 
         HttpContext.Current.Response.Clear();
@@ -163,42 +122,37 @@ public partial class Test : System.Web.UI.Page
         HttpContext.Current.Response.ContentType = "application/ms-excel";
         HttpContext.Current.Response.Write(@"<!DOCTYPE HTML PUBLIC ""-//W3C//DTD HTML 4.0 Transitional//EN"">");
         HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment;filename= " + Sheetname + ".xls");
-     
+        
+
         HttpContext.Current.Response.Charset = "utf-8";
         HttpContext.Current.Response.ContentEncoding = System.Text.Encoding.GetEncoding("windows-1250");
         //sets font
-
-        HttpContext.Current.Response.Write("<TR> <font style='font-size:12.0pt; font-family:Times New Roman;'> <TR>");
+        HttpContext.Current.Response.Write("<Td colspan='5' style='background-color:Maroon;border:solid 1 #fff;color:#fff;'><B> "+Title+"</B>");
+        HttpContext.Current.Response.Write("<TR> <font style='font-size:12.0pt;font-family:Times New Roman;background-color: #D20B0C;color:#ffffff''> <TR>");
         HttpContext.Current.Response.Write("<BR><BR><BR>");
        // sets the table border, cell spacing, border color, font of the text, background, foreground, font height
         HttpContext.Current.Response.Write("<TR> <Table border='1' bgColor='#ffffff' " +
               "borderColor='#000000' cellSpacing='5' cellPadding='0' " +
               "style='font-size:12.0pt; font-family:Calibri; background:white;'> <TR>");
+
+
         //am getting my grid's column headers
         int columnscount = dt.Columns.Count;
 
         for (int j = 0; j < columnscount; j++)
         {      //write in new column 
-           // HttpContext.Current.Response.Write("<TR> <font style = ' font-size:14.opt; background-color: #D20B0C;color:#ffffff'> <TR>");
+               // HttpContext.Current.Response.Write("<TR> <font style = ' font-size:14.opt; background-color: #D20B0C;color:#ffffff'> <TR>");
+            //HttpContext.Current.Response.Write("<TC> <font style='font-size:12.0pt; font-family:Times New Roman;'> <TR>");
             HttpContext.Current.Response.Write("<Td>");
             HttpContext.Current.Response.Write("<B>");
            
             //Get column headers  and make it as bold in excel columns
             HttpContext.Current.Response.Write(dt.Columns[j].ColumnName.ToString());
             HttpContext.Current.Response.Write("</B>");
-            //HttpContext.Current.Response.Write("</Td>");
+            HttpContext.Current.Response.Write("</Td>");
            // HttpContext.Current.Response.Write("</th>");
         }
-      
-        HttpContext.Current.Response.Write("<Td>");
-        HttpContext.Current.Response.Write("<Td>");
-        //string headerTable = @"<img src='" + "http://localhost:49766/ChartImg.axd?i=chart_831bcb4e95154836baf7f6819c30497c_0.png&g=27969d6efd014939a108f29dcda1ae5a" + @"' \>";
-        string headerTable = @"<img src='" + saveChart(chartID) + @"' \>";
-        HttpContext.Current.Response.Write(headerTable);
-        HttpContext.Current.Response.Write("<Td>");
-
-
-        HttpContext.Current.Response.Write("<Td>");
+  
         HttpContext.Current.Response.Write("</TR>");
 
         foreach (DataRow row in dt.Rows)
@@ -224,49 +178,33 @@ public partial class Test : System.Web.UI.Page
     }
 
 
-    private String saveChart(Chart chartID)
-    {
-        // string tmpChartName = chartID.ID.ToString() + ".jpg";
 
 
-        // string imgPath = HttpContext.Current.Request.PhysicalApplicationPath + tmpChartName;
-        // chartID.SaveImage(imgPath);
 
-        string tmpChartName = chartID.ImageLocation;
-        string imgPath2 = Request.Url.GetLeftPart(UriPartial.Authority) + VirtualPathUtility.ToAbsolute("~/" + tmpChartName);
-
-        return imgPath2;
+    //test
 
 
-    }
+    //public void toexcel(string Filename)
+    //{
+    //    MemoryStream ms = DataTableToExcelXlsx();
+    //    ms.WriteTo(HttpContext.Current.Response.OutputStream);
+    //    HttpContext.Current.Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    //    HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment;filename=" + Filename);
+    //    HttpContext.Current.Response.StatusCode = 200;
+    //    HttpContext.Current.Response.End();
+    //}
 
-    //    string tmpChartName = "ChartImage.jpg";
 
-    //    string imgPath = HttpContext.Current.Request.PhysicalApplicationPath + tmpChartName;
-
-    //    chart.SaveImage(imgPath);
-
-    //string imgPath2 = Request.Url.GetLeftPart(UriPartial.Authority) + VirtualPathUtility.ToAbsolute("~/" + tmpChartName);
-
-    //    Response.Clear();
-
-    //Response.ContentType = "application/vnd.ms-excel";
-
-    //Response.AddHeader("Content-Disposition", "attachment; filename=Chart.xls;");
-
-    //StringWriter stringWrite = new StringWriter();
-
-    //    HtmlTextWriter htmlWrite = new HtmlTextWriter(stringWrite);
-
-    //    string headerTable = @"
-
-    //";
-
-    //    Response.Write(headerTable);
-
-    //Response.Write(stringWrite.ToString());
-
-    //Response.End();
+    //public static MemoryStream DataTableToExcelXlsx()
+    //{
+    //    MemoryStream Result = new MemoryStream();
+    //    ExcelPackage pack = new ExcelPackage();
+    //    ExcelWorksheet ws = pack.Workbook.Worksheets.Add("testSheet1");
+    //    ExcelWorksheet ws1 = pack.Workbook.Worksheets.Add("testSheet2");
+    //    ExcelWorksheet ws2 = pack.Workbook.Worksheets.Add("testSheet3");
+    //    pack.SaveAs(Result);
+    //    return Result;
+    //}
 }
 
 

@@ -135,6 +135,13 @@
             text-align: right;
             width: 658px;
         }
+        .calendar{
+            font-family: 'Raleway', sans-serif;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 20%;
+    margin-right: auto;
+        }
     </style>
 </asp:Content>
 
@@ -144,7 +151,11 @@
         <br />
         <asp:Label ID="lblPoints" runat="server" CssClass="reward-points" Font-Size="X-Large"></asp:Label>
         <br />
-        <asp:Button ID="btnEvent" runat="server" Text="Add Event" CssClass="button" Width="13%" TabIndex="3" />
+        <br />
+        <asp:Button ID="btnEvent" runat="server" Text="Add Event" CssClass="button" TabIndex="3" OnClick="btnEvent_Click" />
+
+
+        <br />
 
 
         <br />
@@ -152,10 +163,10 @@
     <div style="align-content: center">
         <br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-         <asp:Table ID="EventDetails" runat="server" CssClass="table" Width="434px" HorizontalAlign="Center">
+         <asp:Table ID="EventDetails" runat="server" CssClass="calendar" Width="80%" HorizontalAlign="Center">
              <asp:TableRow>
                  <asp:TableCell>
-                     <asp:Calendar ID="Calendar1" runat="server" OnDayRender="Calendar1_DayRender" OnSelectionChanged="Calendar1_SelectionChange" CssClass="btn-aligncenter" BackColor="White" BorderColor="White" BorderWidth="1px" Font-Names="Verdana" Font-Size="9pt" ForeColor="Black" Height="190px" NextPrevFormat="FullMonth" Width="350px">
+                     <asp:Calendar ID="Calendar1" runat="server" OnDayRender="Calendar1_DayRender" OnSelectionChanged="Calendar1_SelectionChange" CssClass="btn-aligncenter" BackColor="White" BorderColor="White" BorderWidth="1px" Font-Names="Verdana" Font-Size="9pt" ForeColor="Black" Height="190px" NextPrevFormat="FullMonth" Width="70%">
                          <DayHeaderStyle Font-Bold="True" Font-Size="8pt" />
                          <NextPrevStyle Font-Bold="True" Font-Size="8pt" ForeColor="#333333" VerticalAlign="Bottom" />
                          <OtherMonthDayStyle ForeColor="#999999" />
@@ -164,27 +175,15 @@
                          <TodayDayStyle BackColor="#CCCCCC" />
                      </asp:Calendar>
                  </asp:TableCell>
-                 <asp:TableCell>
-                    
-                 </asp:TableCell><asp:TableCell>
-       
-                    
-                 </asp:TableCell>
+                 
              </asp:TableRow>
 
          </asp:Table>
         <br />
         <br />
 
-        <asp:GridView ID="gvEvents" runat="server" AllowPaging="True" RowStyle-CssClass="rows" OnPageIndexChanging="gvEvents_PageIndexChanging" Width="90%" CellPadding="4" ForeColor="#333333" GridLines="None" PageSize="5">
-            <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
-            <EditRowStyle BackColor="#999999" />
-            <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
-
-            <HeaderStyle CssClass="header" BackColor="#5D7B9D" Font-Bold="True" ForeColor="White"></HeaderStyle>
-
-            <PagerStyle CssClass="pager" BackColor="#284775" ForeColor="White" HorizontalAlign="Center"></PagerStyle>
-            <%--  <AlternatingRowStyle BackColor="White" />
+        <asp:GridView ID="gvEvents" runat="server" AllowPaging="True" OnPageIndexChanging="gvEvents_PageIndexChanging" CellPadding="4"  GridLines="None" PageSize="5" ForeColor="#333333" HorizontalAlign ="Center">
+            <AlternatingRowStyle BackColor="White" />
             <EditRowStyle BackColor="#2461BF" />
             <FooterStyle BackColor="#507CD1" Font-Bold="True" ForeColor="White" />
             <HeaderStyle BackColor="#507CD1" Font-Bold="True" ForeColor="White" />
@@ -194,14 +193,73 @@
             <SortedAscendingCellStyle BackColor="#F5F7FB" />
             <SortedAscendingHeaderStyle BackColor="#6D95E1" />
             <SortedDescendingCellStyle BackColor="#E9EBEF" />
-            <SortedDescendingHeaderStyle BackColor="#4870BE" />--%>
+            <SortedDescendingHeaderStyle BackColor="#4870BE" />
+
+
+
+
         </asp:GridView>
 
         <br />
 
     </div>
-    <ajaxToolkit:ModalPopupExtender ID="popUpdate" runat="server" TargetControlID="btnEvent" PopupControlID="divAddEvent" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
+    <ajaxToolkit:ModalPopupExtender ID="popUpdate" runat="server" TargetControlID="btnContinuetoAdd" PopupControlID="divAddEvent" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
+    <ajaxToolkit:ModalPopupExtender ID="popSelectCompany" runat="server" TargetControlID="btnEvent" PopupControlID="divSelectCompany" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
     <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="True"></asp:ScriptManager>
+    <div id="divSelectCompany" class="popup" style="width: 700px">
+      <asp:Button ID="Button1" runat="server" Text="" CssClass="btn-close" Style="background-image: url('http://icons.iconarchive.com/icons/iconsmind/outline/24/Close-icon.png'); background-repeat: no-repeat" />
+        <h1> SELECT COMPANY</h1>
+        <%--<asp:Table ID="CompanyTable" runat="server" CssClass="table" Width="700px"  HorizontalAlign="Center">--%>
+        <asp:GridView ID="CompanyGrid" runat="server" AllowPaging="True" RowStyle-CssClass="rows" OnSelectedIndexChanged="CompanyGrid_SelectedIndexChanged" OnPageIndexChanging="CompanyGrid_PageIndexChanging" Width="90%" CellPadding="4" ForeColor="#333333" GridLines="None" PageSize="5" EmptyDataText="No Record Found" CellSpacing="1" AutoGenerateColumns="False">
+
+            <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+            <Columns>
+                <asp:TemplateField HeaderText="BusinessEntityID" Visible ="false">
+                    <EditItemTemplate>
+                        <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("BusinessEntityID") %>'></asp:TextBox>
+                    </EditItemTemplate>
+                    <ItemTemplate>
+                        <asp:Label ID="Label1" runat="server" Text='<%# Bind("BusinessEntityID") %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="BusinessEntityName">
+                    <EditItemTemplate>
+                        <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("BusinessEntityName") %>'></asp:TextBox>
+                    </EditItemTemplate>
+                    <ItemTemplate>
+                        <asp:Label ID="Label2" runat="server" Text='<%# Bind("BusinessEntityName") %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:TemplateField HeaderText="BusinessEntityEmail">
+                    <EditItemTemplate>
+                        <asp:TextBox ID="TextBox3" runat="server" Text='<%# Bind("BusinessEntityEmail") %>'></asp:TextBox>
+                    </EditItemTemplate>
+                    <ItemTemplate>
+                        <asp:Label ID="Label3" runat="server" Text='<%# Bind("BusinessEntityEmail") %>'></asp:Label>
+                    </ItemTemplate>
+                </asp:TemplateField>
+                <asp:CommandField ShowSelectButton="True" />
+            </Columns>
+            <EditRowStyle BackColor="#999999" />
+            <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+            <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+            <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+<RowStyle CssClass="rows" BackColor="#F7F6F3" ForeColor="#333333"></RowStyle>
+            <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+            <SortedAscendingCellStyle BackColor="#E9E7E2" />
+            <SortedAscendingHeaderStyle BackColor="#506C8C" />
+            <SortedDescendingCellStyle BackColor="#FFFDF8" />
+            <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
+
+
+        </asp:GridView>
+           <%-- <asp:TableRow>
+                <asp:TableCell>--%>
+                    <asp:Button ID="BtnContinuetoAdd" runat="server" class="auto-style6" Text="Add" Width="130px" ValidationGroup="Provider" OnClick="BtnContinuetoAdd_Click" CssClass="button"></asp:Button>
+              <%--  </asp:TableCell>
+            </asp:TableRow>--%>
+        <%--</asp:Table>--%>
+    </div>
     <div id="divAddEvent" class="popup" style="width: 700px">
         <h1>ADD NEW EVENTS</h1>
         <asp:Table ID="Table1" runat="server" CssClass="table" Width="700px" HorizontalAlign="Center">
@@ -225,9 +283,7 @@
                 </asp:TableCell><asp:TableCell>
                     <asp:TextBox ID="txtTime" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
                     <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ValidationGroup="Provider" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtTime" ErrorMessage="*"></asp:RequiredFieldValidator>
-                </asp:TableCell>
-            </asp:TableRow>
-            <asp:TableRow>
+                </asp:TableCell></asp:TableRow><asp:TableRow>
                 <asp:TableCell></asp:TableCell><asp:TableCell>
                     <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ForeColor="Red" ErrorMessage="Enter correct time format,eg. 13:59" ValidationGroup="Provider" Display="Dynamic" ControlToValidate="txtTime" ValidationExpression="^(?:[01]\d|2[0-3]):[0-5]\d$"></asp:RegularExpressionValidator>
                 </asp:TableCell></asp:TableRow><asp:TableRow>
@@ -238,9 +294,7 @@
                     <asp:RequiredFieldValidator ID="RequiredFieldValidator3" ValidationGroup="Provider" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtDate" ErrorMessage="*"></asp:RequiredFieldValidator>
                     
 
-                </asp:TableCell>
-            </asp:TableRow>
-            <asp:TableRow>
+                </asp:TableCell></asp:TableRow><asp:TableRow>
                 <asp:TableCell></asp:TableCell><asp:TableCell>
                      <asp:CompareValidator id="cmpEventDate" ControlToValidate ="txtDate" ForeColor="Red" Text ="MM/DD/YYYY" Operator="DataTypeCheck" Type="Date" Runat ="server" ValidationGroup="Provider" />
                &nbsp;&nbsp;&nbsp;&nbsp;     <asp:CompareValidator ID="laterthantoday" runat="server"  ValidationGroup="Provider" ControlToValidate="txtDate" ForeColor="Red" Type="Date" Operator="GreaterThanEqual" ErrorMessage="You cannot add an event in the past time! "></asp:CompareValidator>
@@ -250,17 +304,13 @@
                 </asp:TableCell><asp:TableCell>
                     <asp:TextBox ID="txtStreet" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
                     <asp:RequiredFieldValidator ID="RequiredFieldValidator4" ValidationGroup="Provider" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtStreet" ErrorMessage="*"></asp:RequiredFieldValidator>
-                </asp:TableCell>
-            </asp:TableRow>
-            <asp:TableRow>
+                </asp:TableCell></asp:TableRow><asp:TableRow>
                 <asp:TableCell>
                     <asp:Label ID="lblCity" runat="server" class="auto-style1" Text="City:"></asp:Label>
                 </asp:TableCell><asp:TableCell>
                     <asp:TextBox ID="txtCity" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
                     <asp:RequiredFieldValidator ID="RequireddValidator1" ValidationGroup="Provider" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtCity" ErrorMessage="*"></asp:RequiredFieldValidator>
-                </asp:TableCell>
-            </asp:TableRow>
-            <asp:TableRow>
+                </asp:TableCell></asp:TableRow><asp:TableRow>
                 <asp:TableCell>
                     <asp:Label ID="lblState" runat="server" class="auto-style1" Text="State:"></asp:Label>
                 </asp:TableCell><asp:TableCell>
@@ -320,9 +370,7 @@
                     </asp:DropDownList>
                     <asp:CompareValidator ID="reqTB" runat="server" ControlToValidate="drpState" ErrorMessage="*" ForeColor="Red"
                         ValueToCompare="0" Operator="NotEqual" ValidationGroup="Provider"></asp:CompareValidator>
-                </asp:TableCell>
-            </asp:TableRow>
-            <asp:TableRow>
+                </asp:TableCell></asp:TableRow><asp:TableRow>
                 <asp:TableCell>
                     <asp:Label ID="lblZip" runat="server" Text="Zip:"></asp:Label>
                 </asp:TableCell><asp:TableCell>
@@ -330,17 +378,12 @@
                     <asp:RequiredFieldValidator runat="server" ValidationGroup="Provider" ID="typeRequired" ControlToValidate="txtZip" ForeColor="Red" ErrorMessage="*"></asp:RequiredFieldValidator>
                      <asp:CompareValidator id="CompareValidator1" ControlToValidate ="txtZip" ForeColor="Red" Text ="Enter Integer" Operator="DataTypeCheck" Type="Integer" Runat ="server" ValidationGroup="Provider" />
                     
-                </asp:TableCell>
-            </asp:TableRow>
-            <asp:TableRow>
+                </asp:TableCell></asp:TableRow><asp:TableRow>
                 <asp:TableCell></asp:TableCell><asp:TableCell>
-                    </asp:TableCell></asp:TableRow>
-            <asp:TableRow>
+                    </asp:TableCell></asp:TableRow><asp:TableRow>
                 <asp:TableCell>          
                 </asp:TableCell><asp:TableCell>                      
-                </asp:TableCell>
-            </asp:TableRow>
-            <asp:TableFooterRow>
+                </asp:TableCell></asp:TableRow><asp:TableFooterRow>
                 <asp:TableCell>
                     <asp:Button ID="btnAddNew" runat="server" class="auto-style6" Text="Add" Width="130px" ValidationGroup="Provider" OnClick="btnAddNew_Click" CssClass="button"></asp:Button>
                     <asp:Button ID="btnautofill" runat="server" class="auto-style6" Text="Auto-fill" Width="130px" CausesValidation="false" OnClick="btnautofill_Click" CssClass="button"></asp:Button>

@@ -71,11 +71,10 @@
         <div class="auto-style1">
         </div>
         <div>
-            <%--<asp:Button ID="btnForgotUsername" CssClass="btn-forgot" runat="server" Text="Forgot Username" Width="130px" Height="30px" />--%>
             <table class="auto-style2">
                 <tr>
                     <td class="auto-style7">
-                        <asp:Image ID="Image1" runat="server" ImageUrl="~/image/ExcelLogo.png" class="rewardIcon" />
+                        <asp:Image ID="Image1" runat="server" ImageUrl="~/image/Picture2.png" class="rewardIcon" />
                     </td>
                 </tr>
                 <tr>
@@ -98,27 +97,6 @@
                 </tr>
             </table>
         </div>
-
-
-        <%--<ajaxToolkit:ModalPopupExtender ID="popResendUserName" runat="server" TargetControlID="btnForgotUsername" PopupControlID="divResendUserName" CancelControlID="cancelEmail" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>--%>
-        <%--        <div id="divResendUserName" class="popup" style="width: 280px">
-            <asp:Table ID="tblResetEmail" runat="server" HorizontalAlign="Left" CssClass="table">
-
-                <asp:TableRow>
-                    <asp:TableCell>
-                        <asp:TextBox ID="txtEmail" runat="server" CssClass="textbox" Width="230px" placeholder="Enter Email to receive UserName"></asp:TextBox>
-                    </asp:TableCell><asp:TableCell>
-                        <asp:RequiredFieldValidator ValidationGroup="UserName" ID="RequiredFieldValidator2" runat="server" class="auto-style8" ControlToValidate="txtEmail" ErrorMessage="*"></asp:RequiredFieldValidator>
-                        <asp:RegularExpressionValidator ValidationGroup="UserName" ID="RegularExpressionValidator2" runat="server"
-                            ControlToValidate="txtEmail" ErrorMessage="Please enter correct email"
-                            ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
-                    </asp:TableCell>
-                </asp:TableRow>
-            </asp:Table>
-            <asp:Button ID="resendEmail" ValidationGroup="UserName" runat="server" Text="Send Your UserName to Your Email" CssClass="button" OnClick="resendEmail_Click" />
-            <asp:Button ID="cancelEmail" runat="server" CssClass="btn-close" Style="background-image: url('http://icons.iconarchive.com/icons/iconsmind/outline/24/Close-icon.png'); background-repeat: no-repeat" />
-        </div>--%>
-
     </form>
 
 </body>

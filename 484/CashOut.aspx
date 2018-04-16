@@ -1,75 +1,9 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/EmployeeMasterPage.master" AutoEventWireup="true" CodeFile="CashOut.aspx.cs" Inherits="CashOut" EnableEventValidation="false" %>
 
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <style type="text/css">
-        body {
-        }
-
-        .mydatagrid {
-            border: 1px solid #fff
-        }
-
-        .rounded-corners {
-            border: 1px solid #fff;
-            -webkit-border-radius: 8px;
-            -moz-border-radius: 8px;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .header {
-            background-color: #B3C100;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            border: none 0px transparent;
-            height: 25px;
-            text-align: center;
-            font-size: 20px;
-        }
-
-        .rows {
-            background-color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 15px;
-            color: #000;
-            min-height: 25px;
-            text-align: center;
-            border: none 0px transparent;
-        }
-
-            /*.rows:hover {
-                background-color: #EAEDED;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                color: #666262;
-                text-align: center;
-            }*/
-
-        .selectedrow {
-            background-color: #EAEDED;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .mydatagrid {
-            background-color: transparent;
-            padding: 5px 5px 5px 5px;
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .mydatafrid a:hover {
-            background-color: #000;
-            color: #566573;
-        }
-
-        .mydatagrid span {
-            background-color: #bece02;
-            color: #000;
-            padding: 5px 5px 5px 5px;
-        }
-
         .pager {
             background-color: #B3C100;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -78,137 +12,129 @@
             text-align: center;
         }
 
-        .mydatagrid td {
-            padding: 5px;
+        .grid {
+            margin: auto;
         }
 
-        .mydatagrid th {
-            padding: 5px;
+        .button,.buttonLeft, .buttonRight {
+            color: #fff;
+            background-color: #17468A;
+            display: inline;
+            height: 30px;
+            font-weight: normal;
+            white-space: nowrap;
+            vertical-align: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            border: 1px solid transparent;
+            font-size: 1rem;
+            line-height: 1.25;
+            border-radius: 0.25rem;
+            transition: all 0.15s ease-in-out;
+            position: relative;
+            margin: auto;
         }
-
-        .auto-style12 {
-            width: 1069px;
+        .buttonLeft{
+            float:right;
+            margin-right:3%;
         }
-
-        .auto-style13 {
-            text-align: center;
+        .buttonRight{
+            float:left;
+             margin-left:3%;
         }
-
-        .auto-style14 {
-            width: 120%;
-            margin-left: 8px;
-        }
-        .auto-style16 {
-            margin-left: 163px;
-        }
-
-        .auto-style17 {
-            font-family: 'Raleway', sans-serif; /*height: 10%;*/
-            padding: 9px 9px 9px 9px;
-            margin-left: auto;
-            margin-right: auto;
-            border-radius: 25px;
-            border: 2px solid #17468A;
-            margin: 2%;
-        }
-
-        .auto-style18 {
-            text-align: center;
-            height: 22px;
-        }
-
-        .auto-style19 {
-            width: 658px;
-        }
-
-        .auto-style20 {
-            text-align: right;
-            width: 658px;
-        }
-
     </style>
 
     <br />
     <h2>
-        <asp:Label runat="server" Text="Redeem Reward" ID="lblName" CssClass="reward-points" Width="25%" Font-Size="X-Large" ForeColor="#17468A"></asp:Label></h2>
+        <asp:Label runat="server" Text="Redeem Reward" ID="lblName" CssClass="reward-points" Font-Size="X-Large" ForeColor="#17468A"></asp:Label></h2>
 
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" runat="Server">
+    <div class="btn-aligncenter">
+        </div>
+    <div style="text-align: center; align-content: center">
+        <asp:Label ID="redeemlabel" runat="server" Text="Label" ForeColor="#105c96" Style="font-size: large; text-align: center; margin: auto"></asp:Label>
+        <br />
+        <asp:Label ID="RedeemedGiftLabel" runat="server" Text="Label" ForeColor="#105c96" Style="font-size: large"></asp:Label>
+        <br />
+        <asp:Label ID="Quantitylbl" runat="server" Style="font-size: medium; text-decoration: none; text-align: center; margin-left: 2%" ForeColor="#105c96"></asp:Label>
 
-    <div class="btn-aligncenter" style="width: 90%">
-    </div>
-    <br />
-    <asp:Label ID="redeemlabel" runat="server" Text="Label" ForeColor="#105c96" Style="font-size: large; text-align: center; margin-left: 30%"></asp:Label>
-    <br />
+        <asp:TextBox ID="Quantitytxt" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
+        <div class="grid">
+            <asp:GridView ID="gvImages" runat="server" AutoGenerateColumns="False" CssClass="grid" DataKeyNames="GiftCardID" OnRowDataBound="OnRowDataBound2" RowStyle-CssClass="rows" OnSelectedIndexChanged="gvImages_onSelectIndexChanged" AllowPaging="True" OnPageIndexChanging="RewardsGrid_ChangingPages" PageSize="10" CellPadding="5" ForeColor="#333333" GridLines="None">
+                <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+                <Columns>
+                    <asp:TemplateField HeaderText="GiftCard">
+                        <ItemTemplate>
+                            <asp:Image ID="Image1" runat="server" />
+                        </ItemTemplate>
 
+                    </asp:TemplateField>
+                    <asp:BoundField DataField="ProviderName" HeaderText="Provider Name" />
+                    <asp:BoundField DataField="GiftCardAmount" HeaderText="Amount" />
 
+                </Columns>
+                <EditRowStyle BackColor="#999999" />
+                <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
 
-    <br />
-    <div style="margin-left:5%; text-align:center;align-content:center">
-        <table class="auto-style16">
-                <tr>
-                    <td class="auto-style12">
-                        <div class="auto-style13">
-                            <table class="auto-style14">
-                                <tr>
-                                    <td class="auto-style18" colspan="2"></td>
-                                </tr>
-                                <tr>
-                                    <td class="auto-style19">
+                <HeaderStyle CssClass="header" BackColor="#5D7B9D" Font-Bold="True" ForeColor="White"></HeaderStyle>
 
-                                        <asp:Label ID="RedeemedGiftLabel" runat="server" Text="Label" CssClass="auto-style14" ForeColor="#105c96" Style="font-size: large"></asp:Label>
-                                        <br />
-                                        <br />
-                                        <asp:Label ID="Quantitylbl" runat="server" Style="font-size: medium; text-decoration: none; text-align:center; margin-left:2%" ForeColor="#105c96"></asp:Label>
-                                        <br />
+                <PagerStyle CssClass="pager" BackColor="#284775" ForeColor="White" HorizontalAlign="Center"></PagerStyle>
 
-                                        <asp:TextBox ID="Quantitytxt" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td class="auto-style20">
-                                        <div class="auto-style13">
-                                            &nbsp;&nbsp;&nbsp;
-                        <asp:GridView ID="gvImages" runat="server" AutoGenerateColumns="False" OnRowDataBound="OnRowDataBound2"  RowStyle-CssClass= "rows" OnSelectedIndexChanged="gvImages_onSelectIndexChanged" AllowPaging="True" OnPageIndexChanging="RewardsGrid_ChangingPages" PageSize="5" Width="80%" Height="70%" CellPadding="5" ForeColor="#333333" GridLines="None">
-                            <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
-                            <Columns>
-                                <asp:TemplateField HeaderText="GiftCard">
-                                    <ItemTemplate>
-                                        <asp:Image ID="Image1" runat="server" />
-                                    </ItemTemplate>
-
-                                </asp:TemplateField>
-                                <asp:BoundField DataField="JobTitle" HeaderText="Provider Name" SortExpression="JobTitle" />
-                                <asp:BoundField DataField="Amount" HeaderText="Amount" SortExpression="Amount" />
-
-                            </Columns>
-                            <EditRowStyle BackColor="#999999" />
-                            <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
-
-                            <HeaderStyle CssClass="header" BackColor="#5D7B9D" Font-Bold="True" ForeColor="White"></HeaderStyle>
-
-                            <PagerStyle CssClass="pager" BackColor="#284775" ForeColor="White" HorizontalAlign="Center"></PagerStyle>
-
-<%--                            <RowStyle CssClass="rows" BackColor="#F7F6F3" ForeColor="#333333"></RowStyle>
-                            <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
-                            <SortedAscendingCellStyle BackColor="#E9E7E2" />
-                            <SortedAscendingHeaderStyle BackColor="#506C8C" />
-                            <SortedDescendingCellStyle BackColor="#FFFDF8" />
-                            <SortedDescendingHeaderStyle BackColor="#6F8DAE" />--%>
-                        </asp:GridView>
-                                            <br />
-                                            <br />
-                                        <br />
-                                        <asp:Button ID="RedeemButton" runat="server" OnClick="Button1_Click" Text="Redeem" CssClass="btn-profile" Width="20%" Height="30%" />
-                                        </div>  
-                                    </td>
-                            </table>
-                        </div>
-            </table>
+            </asp:GridView>
+            <asp:Button ID="RedeemButton" runat="server" Text="Get Reward" OnClick="btnCompany_Click" CssClass="button" />
+            </div>
+        </div>
+            <%--<asp:Button ID="withdraw" runat="server" Text="Withdraw Points" CssClass="button" />
+        </div>
     </div>
 
+    <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="True"></asp:ScriptManager>
+    <ajaxToolkit:ModalPopupExtender ID="popRedeem" runat="server" TargetControlID="RedeemButton" PopupControlID="divRedeem" CancelControlID="btnRedeemCancel" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
+    <ajaxToolkit:ModalPopupExtender ID="popWithdraw" runat="server" TargetControlID="withdraw" PopupControlID="divWithdraw" CancelControlID="btnWithdrawCancel" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
+
+    <div id="divRedeem" class="popup" style="width: 30%">
+
+        <div style="width:50%;float:left">
+            <asp:Button ID="btnCompany" runat="server" Text="Use Points" OnClick="btnCompany_Click" CssClass="buttonLeft" />
+
+        </div>
+                <div style="width:50%;float:right">
+            <asp:Button ID="btnPerson" runat="server" Text="Use Paypal" OnClick="Button1_Click" CssClass="buttonRight" />
+
+        </div>
+
+        <asp:Button ID="btnRedeemCancel" runat="server" Text="" CssClass="btn-close" Style="background-image: url('http://icons.iconarchive.com/icons/iconsmind/outline/24/Close-icon.png'); background-repeat: no-repeat" />
+    </div>
+
+    <div id="divWithdraw" class="popup" style="width: 30%">
+        <asp:Table ID="tblwithdraw" runat="server" HorizontalAlign="Center">
+            <asp:TableRow runat="server">
+                <asp:TableCell runat="server">
+                    <asp:Label ID="lblWithDraw" runat="server" Text="Withdraw Amount:" ></asp:Label>
+                </asp:TableCell>
+            </asp:TableRow>
+            <asp:TableRow>
+                <asp:TableCell runat="server">
+                    <asp:TextBox ID="txtWithDraw" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
+                </asp:TableCell>
+            </asp:TableRow>
+            <asp:TableRow>
+                <asp:TableCell runat="server">
+                    <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ValidationGroup="withdraw" runat="server" ForeColor="Red" ControlToValidate="txtWithDraw" ErrorMessage="*"></asp:RequiredFieldValidator>
+                    <asp:RegularExpressionValidator ValidationGroup="withdraw" ID="withdrawMessage" runat="server" ForeColor="Red" ControlToValidate="txtWithDraw" ValidationExpression="^[1-9]\d*$" Text="Only interger allowed" />
+                </asp:TableCell>
+            </asp:TableRow>
+            <asp:TableRow>
+                <asp:TableCell runat="server">
+                    <asp:Button ID="withdrawCommit" runat="server" Text="Commit" ValidationGroup="withdraw" OnClick="withdrawCommit_Click" CssClass="button" />
+                </asp:TableCell>
+            </asp:TableRow>
+        </asp:Table>
+        <asp:Button ID="btnWithdrawCancel" runat="server" Text="" CssClass="btn-close" Style="background-image: url('http://icons.iconarchive.com/icons/iconsmind/outline/24/Close-icon.png'); background-repeat: no-repeat" />
+    </div>--%>
 
 </asp:Content>

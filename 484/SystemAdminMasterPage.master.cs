@@ -47,21 +47,6 @@ public partial class SystemAdminMasterPage : System.Web.UI.MasterPage
 
                 }
                 break;
-            case "SystemAdmin":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("SytemAdminprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-
-                }
-                break;
             case "Employee":
                 switch (Session["DefaultPage"].ToString())
                 {
@@ -88,6 +73,9 @@ public partial class SystemAdminMasterPage : System.Web.UI.MasterPage
                     case "Homepage":
                         Response.Redirect("RewardProvider.aspx");
                         break;
+                    case "GiftCardInfo":
+                        Response.Redirect("GiftCardInfo.aspx");
+                        break;
                     case "Setting":
                         Response.Redirect("Providerprofile.aspx");
                         break;
@@ -95,6 +83,7 @@ public partial class SystemAdminMasterPage : System.Web.UI.MasterPage
                         Response.Redirect("RewardProvider.aspx");
                         break;
                 }
+
                 break;
             default:
                 SqlConnection con = new SqlConnection();
@@ -102,8 +91,6 @@ public partial class SystemAdminMasterPage : System.Web.UI.MasterPage
                 con.Open();
                 SqlCommand command = new SqlCommand();
                 command.Connection = con;
-
-
                 txtName.Text = Session["FirstName"].ToString() + " " + Session["Middle"].ToString() + " " + Session["last"].ToString();
                 profilePicture();
                 con.Close();
@@ -125,7 +112,7 @@ public partial class SystemAdminMasterPage : System.Web.UI.MasterPage
         SqlConnection sc = new SqlConnection();
         sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
         sc.Open();
-        string sql = "SELECT [ProfilePicture] FROM person WHERE PersonEmail = @PersonEmail";
+        string sql = "SELECT [ProfilePicture] FROM Person WHERE PersonEmail = @PersonEmail";
         SqlCommand cmd = new SqlCommand(sql, sc);
         cmd.Parameters.AddWithValue("@PersonEmail", Session["E-mail"]);
         SqlDataReader dr = cmd.ExecuteReader();

@@ -5,18 +5,50 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
     <br />
+    <style type="text/css">
+        #profilepic{
+            float: left; 
+            margin-left: 40px;
+            margin-top:15px;
+            visibility:visible;
+            position:relative;
+            width:15%;
+        }
+        #profilecontent{
+            float: left; 
+            margin-left: 20px; 
+            text-align: left;
+        }
+        @media screen and (min-width:810px) and (max-width: 1023px) {
+            #profilepic{
+            width:20%;
+            margin-left: 20px;
+            
+        }
+           
+                    .reward-points{
+                        font-size:large;
+                    }
+        }
+        @media screen and (max-width:809px){
+              #profilepic{
+            visibility:hidden;
+            position:absolute;
+        }
+        }
+
+        </style>
     <h2>
         <asp:Label runat="server" Text="" ID="lblName" CssClass="reward-points" Width="30%" Font-Size="X-Large" ForeColor="#17468A"></asp:Label></h2>
 
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" runat="Server">
-    <div class="btn-aligncenter" style="width: 90%">
+    <div class="btn-aligncenter">
 
-        <div style="float: left; margin-left: 40px;">
-            <br />
-            <asp:Image ID="picture" runat="server" Height="200px" />
+        <div id="profilepic" >
+            <asp:Image ID="picture" runat="server" Width="100%" />
         </div>
-        <div style="float: left; margin-left: 20px; text-align: left;">
+        <div id="profilecontent">
             <h2>
                 <asp:Label ID="lblFullName" runat="server" Text="" CssClass="reward-points"></asp:Label></h2>
             <br />
@@ -125,7 +157,7 @@
                     <asp:Label ID="lblNickName" runat="server" class="auto-style1" Text="Nick Name:"></asp:Label>
                 </asp:TableCell><asp:TableCell>
                     <asp:TextBox ID="txtNickName" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ValidationGroup="profile" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtNickName" ErrorMessage="*"></asp:RequiredFieldValidator>
+                    
                 </asp:TableCell></asp:TableRow><asp:TableRow>
                 <asp:TableCell></asp:TableCell><asp:TableCell>
                     <asp:RegularExpressionValidator ID="RegularExpressionValidator2" ValidationGroup="profile" ForeColor="Red" runat="server" ControlToValidate="txtNickName" ValidationExpression="^[a-zA-Z0-9\-_]{1,20}$" Text="No more than 20 characters" />

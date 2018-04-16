@@ -31,9 +31,9 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" runat="Server">
     <div class="btn-aligncenter" style="width: 90%"></div>
     <br />
-        <iframe style="height:850px;width:90%;"
-            src="https://us-east-1.online.tableau.com/t/lekuai/views/ReportNew/Analytics?iframeSizedToWindow=true&:embed=y&:showAppBanner=false&:display_count=no&:showVizHome=no"></iframe>
+        <iframe id="Tableau" runat="server" style="height:850px;width:90%;"></iframe>
         <br />
+    
         <div >
             <asp:Table ID="Table1" runat="server" CaptionAlign="Left" CellPadding="10" CellSpacing="5">
                 <asp:TableRow>
@@ -58,18 +58,11 @@
             </asp:Table>
              
         
-         
-           
-          
-         
-     
-            
-     
         </div>
 
 
 
-        <div hidden="hidden">
+<%--        <div hidden="hidden">
              <asp:Chart ID="ValueGraph" runat="server" DataSourceID="value" Height="380px" Width="815px">
                 <Series>
                     <asp:Series Name="Series1" XValueMember="ValueName" YValueMembers="RewardTimes" ChartType="Radar" IsValueShownAsLabel="True">
@@ -153,7 +146,7 @@ GROUP BY  Convert(Date,LastUpdated)
                      </asp:Title>
                  </Titles>
              </asp:Chart>
-             <asp:SqlDataSource ID="ProviderCash" runat="server" ConnectionString="<%$ ConnectionStrings:GroupProjectConnectionString %>" SelectCommand="SELECT        SUM(RedeemTransaction.RedeemAmount * RedeemTransaction.RedeemQuantity)/
+            <%-- <asp:SqlDataSource ID="ProviderCash" runat="server" ConnectionString="<%$ ConnectionStrings:GroupProjectConnectionString %>" SelectCommand="SELECT        SUM(RedeemTransaction.RedeemAmount * RedeemTransaction.RedeemQuantity)/
 (SELECT        SUM(MoneyTransaction.TransactionAmount) AS Expr1
 FROM            MoneyTransaction
 where 
@@ -162,8 +155,8 @@ FROM            RedeemTransaction INNER JOIN
                          Person ON RedeemTransaction.ProviderID = Person.PersonID
 GROUP BY Person.JobTitle
 "></asp:SqlDataSource>
-        </div>
-    </div>
+        </div>--%>
+  
     
 
 

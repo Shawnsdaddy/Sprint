@@ -8,6 +8,16 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" runat="Server">
      <style type="text/css">
 /*WHEEL*/
+        .auto-style18 {
+            text-align: center;
+            height: 22px;
+             font-weight: 700;
+             color: #000099;
+             font-size:xx-large;
+             font-family: 'Raleway', sans-serif;
+         }
+@media screen and (min-width:481px) and (max-width: 1023px) {
+
     text{
        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size:11px;
@@ -158,7 +168,8 @@
             height: 22px;
              font-weight: 700;
              color: #000099;
-             font-size: large;
+             font-size: 22px;
+             font-family: 'Raleway', sans-serif;
          }
 
         .auto-style19 {
@@ -184,11 +195,14 @@
         <br />
         <asp:Label ID="lblPoints" runat="server" Text="Points" CssClass="auto-style18"></asp:Label>
         <br />
+        <br />
         <asp:Button ID="btnReward" runat="server" Text="Reward Peers" class="button" TabIndex="3" />
         <asp:Button ID="btnCalendar" runat="server" Text="View Events Calendar" class="button"  TabIndex="3" CausesValidation="False" />
         <asp:Button ID="btnSpin" runat="server" Text="Free Time On Your Hands?" class="button" TabIndex="3" CausesValidation="False" />
+        <%--<asp:Button ID="btnViewAll" runat="server" Text="View All" class= "button" OnClick="btnViewAll_Click" CausesValidation="False" />--%>
 
                 <%--<ajaxToolkit:ModalPopupExtender ID="btnSpin_PopUp" runat="server" TargetControlID="btnSpin" PopupControlID="spin" CancelControlID="btnCancel" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>--%>
+        <br />
         <br />
     </div>
     <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="True"></asp:ScriptManager>
@@ -509,7 +523,25 @@
         <br />
 
             <ajaxToolkit:ModalPopupExtender ID="ModalPopupExtender1" runat="server" TargetControlID="btnCalendar" PopupControlID="CalendarPanel" CancelControlID="btnCancel" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
-             <asp:Panel ID="CalendarPanel" CssClass="popup" runat="server">
+            <ajaxToolkit:ModalPopupExtender ID="popViewAll" runat="server" TargetControlID="btnViewAll" PopupControlID="ViewAllPanel" CancelControlID="btnCancel" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
+           <asp:Button ID="btnViewAll" runat="server" Text="View All" class= "button" OnClick="btnViewAll_Click" CausesValidation="False" />
+            
+            <div ID="ViewAllPanel" class="popup" runat="server" style="width: 750px;">
+                          <asp:Button ID="Button1" runat="server" Text="" CssClass="btn-close" Style="background-image: url('http://icons.iconarchive.com/icons/iconsmind/outline/24/Close-icon.png'); background-repeat: no-repeat" />
+              
+                <h1> All Events In Calendar</h1>
+
+             <asp:GridView ID="AllGrid" runat="server" AllowPaging ="True"  RowStyle-CssClass= "rows" OnPageIndexChanging="AllGrid_PageIndexChanging" Width="90%" CellPadding="4" ForeColor="#333333" GridLines="None" PageSize="5">
+            <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+            <EditRowStyle BackColor="#999999" />
+            <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+            <HeaderStyle CssClass="header" BackColor="#5D7B9D" Font-Bold="True" ForeColor="White"></HeaderStyle>
+            <PagerStyle CssClass="pager" BackColor="#284775" ForeColor="White" HorizontalAlign="Center"></PagerStyle>
+
+</asp:GridView>
+                          
+            </div>
+            <asp:Panel ID="CalendarPanel" CssClass="popup" runat="server">
                  <h1> Find Events Happening Around You!</h1>
                  
                  <asp:Table ID="EventDetails" runat="server" CssClass="table" Width="434px" HorizontalAlign="Center">
@@ -539,16 +571,15 @@
 
                 </asp:TableCell>
                 <asp:TableCell>
-
+           
                     
                 </asp:TableCell><asp:TableCell>
 
 
-       
-                    
                 </asp:TableCell></asp:TableRow>
              
          </asp:Table>
+              
 
                      <div class ="rounded-corners"></div>
     
@@ -575,13 +606,13 @@
                             <SortedDescendingCellStyle BackColor="#FFFDF8" />
                             <SortedDescendingHeaderStyle BackColor="#6F8DAE" />--%>
 </asp:GridView>
+                
                       <div class ="rounded-corners"></div>
         
         <br />
                  <asp:Button ID="CancelCalendar" runat="server" Text="" CssClass="btn-close" Style="background-image: url('http://icons.iconarchive.com/icons/iconsmind/outline/24/Close-icon.png'); background-repeat: no-repeat" />
              </asp:Panel>
-         
-
+     
     </div>
 
 

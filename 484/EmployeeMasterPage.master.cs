@@ -6,7 +6,9 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Data;
-using System.Configuration; 
+using System.Configuration;
+using System.Web.Configuration;
+
 
 public partial class employeeMasterPage : System.Web.UI.MasterPage
 {
@@ -49,22 +51,29 @@ public partial class employeeMasterPage : System.Web.UI.MasterPage
                 switch (Session["DefaultPage"].ToString())
                 {
                     case "Homepage":
+                        Response.Redirect("SystemAdminHome.aspx");
+                        break;
+                    case "UserInfo":
                         Response.Redirect("SystemAdmin.aspx");
                         break;
-                    case "Setting":
+                    case "Settings":
                         Response.Redirect("SytemAdminprofile.aspx");
                         break;
                     default:
-                        Response.Redirect("SystemAdmin.aspx");
+                        Response.Redirect("SystemAdminHome.aspx");
                         break;
 
                 }
+
                 break;
             case "RewardProvider":
                 switch (Session["DefaultPage"].ToString())
                 {
                     case "Homepage":
                         Response.Redirect("RewardProvider.aspx");
+                        break;
+                    case "GiftCardInfo":
+                        Response.Redirect("GiftCardInfo.aspx");
                         break;
                     case "Setting":
                         Response.Redirect("Providerprofile.aspx");
@@ -73,9 +82,23 @@ public partial class employeeMasterPage : System.Web.UI.MasterPage
                         Response.Redirect("RewardProvider.aspx");
                         break;
                 }
+
                 break;
             default:
                 ShowEmpImage();
+
+                //Modify("AWVlkg6zW8bPcK88nxFc8FfRM1gXbcxxC-Z-R8stlrtdZv819Okk6TgD0AwFX44gOZcsmp9i5gI5rmLP", "EDtJ1b4EYsq1Xs8aM9cGl8uI5G9O-YdiU8Hyyrd0cbCDOf0qPHOQLftu7dJcAjugWSTmxN4uJz8eh-LA");
+
+
+                //Dictionary<string, string> config = new Dictionary<string, string>();
+                //config.Add("mode", "sandbox");
+                //config.Add("clientId", "AWVlkg6zW8bPcK88nxFc8FfRM1gXbcxxC-Z-R8stlrtdZv819Okk6TgD0AwFX44gOZcsmp9i5gI5rmLP");
+                //config.Add("clientSecret", "EDtJ1b4EYsq1Xs8aM9cGl8uI5G9O-YdiU8Hyyrd0cbCDOf0qPHOQLftu7dJcAjugWSTmxN4uJz8eh-LA");
+                //config.Add("account1.apiUsername", "354013233_api1.qq.com");
+                //config.Add("account1.apiPassword", "Q9PPD6TEDSRFLWBV");
+                //config.Add("account1.apiSignature", "AIrjZNoKWfSz9UvFcW7U5u0Bm0sdAGYbepkmCq0ytPQ3ziZvwY9qsnyA");
+
+                //PayPalAPIInterfaceService s = new PayPalAPIInterfaceService(config);
                 break;
         }
 
@@ -96,8 +119,7 @@ public partial class employeeMasterPage : System.Web.UI.MasterPage
         SqlConnection sc = new SqlConnection();
         sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
         sc.Open();
-        //string sql = "SELECT profilepicture FROM person WHERE PersonEmail = @PersonEmail";
-        string sql = "SELECT mi,lastname, profilepicture FROM person WHERE PersonEmail = @PersonEmail";
+        string sql = "SELECT profilepicture FROM person WHERE PersonEmail = @PersonEmail";
         SqlCommand cmd = new SqlCommand(sql, sc);
         cmd.Parameters.AddWithValue("@PersonEmail", Session["E-mail"]);
         SqlDataReader dr = cmd.ExecuteReader();
@@ -105,8 +127,6 @@ public partial class employeeMasterPage : System.Web.UI.MasterPage
         {
             while (dr.Read())
             {
-                Session["middle"] = dr["MI"].ToString();
-                Session["Last"] = dr["LastName"].ToString();
                 if (!Convert.IsDBNull(dr["profilepicture"]))
                 {
                     Byte[] imagedata = (byte[])dr["profilepicture"];
@@ -119,34 +139,9 @@ public partial class employeeMasterPage : System.Web.UI.MasterPage
                 }
             }
         }
-        //txtName.Text = Session["FirstName"].ToString() + " " + Session["Middle"].ToString() + " " + Session["last"].ToString();
-        txtName.Text = Session["FirstName"].ToString() + " " + Session["middle"].ToString() + " " + Session["Last"].ToString();
+        txtName.Text = Session["FirstName"].ToString() + " " + Session["Middle"].ToString() + " " + Session["last"].ToString();
         sc.Close();
 
-        //SqlConnection sc = new SqlConnection();
-        //sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-        //sc.Open();
-        //string sql = "SELECT profilepicture FROM person WHERE username = @username";
-        //SqlCommand cmd = new SqlCommand(sql, sc);
-        //cmd.Parameters.AddWithValue("@username", empno);
-        //SqlDataReader dr = cmd.ExecuteReader();
-        //if (dr.HasRows)
-        //{
-        //    while (dr.Read())
-        //    {
-        //        if (!Convert.IsDBNull(dr["profilepicture"]))
-        //        {
-        //            Byte[] imagedata = (byte[])dr["profilepicture"];
-        //            string img = Convert.ToBase64String(imagedata, 0, imagedata.Length);
-        //            ProfilePicture.ImageUrl = "data:image/png;base64," + img;
-        //        }
-        //        else
-        //        {
-        //            ProfilePicture.ImageUrl = "~/image/empty.png";
-        //        }
-        //    }
-        //}
-        //sc.Close();
     }
 
     public string Updatelable
@@ -166,5 +161,30 @@ public partial class employeeMasterPage : System.Web.UI.MasterPage
     {
         Response.Redirect("employeeProfile.aspx");
     }
+
+    //public void Modify(string Id, string Secret)
+
+    //{
+
+    //    Configuration configuration = WebConfigurationManager.OpenWebConfiguration("~");
+
+    //    PayPal.SDKConfigHandler appSettingsSection = (PayPal.SDKConfigHandler)configuration.GetSection("paypal");
+
+    //    if (appSettingsSection != null)
+    //    {
+
+    //        appSettingsSection.Settings["clientId"].Value = Id;
+    //        appSettingsSection.Settings["clientSecret"].Value = Secret;
+
+    //        configuration.Save();
+
+    //    }
+    //    else
+    //    {
+           
+    //    }
+       
+
+    //}
 }
 

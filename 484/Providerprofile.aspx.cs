@@ -21,74 +21,11 @@ public partial class Providerprofile : System.Web.UI.Page
         HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         HttpContext.Current.Response.AddHeader("Pragma", "no-cache");
         HttpContext.Current.Response.AddHeader("Expires", "0");
-
         if (Session["loggedIn"] == null)
         {
             Response.Redirect("default.aspx");
         }
-        switch (Session["Privilege"].ToString())
-        {
-            case "Administrative":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-                    case "ProviderInfor":
-                        Response.Redirect("CEO_AddProvider.aspx");
-                        break;
-                    case "EmployeeInfor":
-                        Response.Redirect("CreateEmployee.aspx");
-                        break;
-                    case "ViewReport":
-                        Response.Redirect("Report.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("CEOprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-
-                }
-                break;
-            case "SystemAdmin":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("SytemAdminprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-
-                }
-                break;
-            case "Employee":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                    case "GetReward":
-                        Response.Redirect("CashOut.aspx");
-                        break;
-                    case "DashBoard":
-                        Response.Redirect("UserDashboard.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("EmployeeProfile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                }
-                break;
-            default:
-                string name = Session["JobTitle"].ToString();
+                string name = Session["ProviderName"].ToString();
                 lblFullName.Text = name;
                 lblName.Text = name + "'s Profile";
                 if (!Page.IsPostBack)
@@ -100,7 +37,7 @@ public partial class Providerprofile : System.Web.UI.Page
                     SqlCommand insert = new SqlCommand();
 
                     insert.Connection = sc;
-                    insert.CommandText = "select FirstName, LastName, MI, JobTitle from person where PersonEmail = @PersonEmail";
+                    insert.CommandText = "select ProviderEmail from RewardProvider where ProviderEmail = @PersonEmail";
                     insert.Parameters.AddWithValue("@PersonEmail", Session["E-mail"].ToString());
                     SqlDataReader reader = insert.ExecuteReader();
 
@@ -112,14 +49,10 @@ public partial class Providerprofile : System.Web.UI.Page
 
                     }
 
-                    showdata();
+                    //showdata();
                     sc.Close();
                 }
-                break;
-        }
-
-        
-    }
+      }
 
     protected void btnChangePassword_Click(object sender, EventArgs e)
     {
@@ -134,8 +67,10 @@ public partial class Providerprofile : System.Web.UI.Page
             sc.Open();
             SqlCommand insert = new SqlCommand();
             insert.Connection = sc;
-            insert.CommandText = "UPDATE [dbo].[Person] SET [Password] = @Password  where PersonID = @ID";
+            insert.CommandText = "UPDATE [dbo].[RewardProvider] SET [Password] = @Password, LastUpdated=@lasted, LastUpdatedBy=@updatedby where ProviderID = @ID";
             insert.Parameters.AddWithValue("@Password", passwordHashNew);
+            insert.Parameters.AddWithValue("@lasted", DateTime.Today.ToShortDateString());
+            insert.Parameters.AddWithValue("@updatedby", Session["loggedIn"]);
             insert.Parameters.AddWithValue("@ID", Session["ID"].ToString());
             insert.ExecuteNonQuery();
             Response.Write("<script>alert('Password changed successfully')</script>");
@@ -145,7 +80,7 @@ public partial class Providerprofile : System.Web.UI.Page
         else
         {
             Response.Write("<script>alert('OldPassword incorrect')</script>");
-            popPic.Show();
+            popPass.Show();
         }
     }
 
@@ -169,9 +104,11 @@ public partial class Providerprofile : System.Web.UI.Page
 
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = sc;
-                cmd.CommandText = "UPDATE [dbo].[Person] SET [ProfilePicture] = @ProfilePicture WHERE PersonID=@id";
+                cmd.CommandText = "UPDATE [dbo].[RewardProvider] SET [ProfilePicture] = @ProfilePicture,LastUpdated=@lasted, LastUpdatedBy=@updatedby WHERE ProviderID=@id";
 
                 cmd.Parameters.AddWithValue("@ProfilePicture", bytes);
+                cmd.Parameters.AddWithValue("@lasted", DateTime.Now.ToShortDateString());
+                cmd.Parameters.AddWithValue("@updatedby", Session["loggedIn"]);
                 cmd.Parameters.AddWithValue("@id", Session["ID"]);
                 cmd.ExecuteNonQuery();
                 sc.Close();
@@ -197,7 +134,7 @@ public partial class Providerprofile : System.Web.UI.Page
         SqlConnection sc = new SqlConnection();
         sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
         sc.Open();
-        string sql = "SELECT [ProfilePicture] FROM person WHERE PersonEmail = @PersonEmail";
+        string sql = "SELECT [ProfilePicture] FROM [RewardProvider] WHERE ProviderEmail = @PersonEmail";
         SqlCommand cmd = new SqlCommand(sql, sc);
         cmd.Parameters.AddWithValue("@PersonEmail", Session["E-mail"]);
         SqlDataReader dr = cmd.ExecuteReader();
@@ -236,78 +173,19 @@ public partial class Providerprofile : System.Web.UI.Page
         client.Host = "smtp.gmail.com";
         client.Send(mail);
     }
-
-    protected void gdvShow_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
-    {
-        gdvShow.EditIndex = -1;
-        showdata();
-    }
-
-    protected void gdvShow_RowEditing(object sender, GridViewEditEventArgs e)
-    {
-        SqlConnection sc = new SqlConnection();
-        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-        sc.Open();
-        gdvShow.EditIndex = e.NewEditIndex;
-        showdata();
-        sc.Close();
-    }
-
-    protected void gdvShow_RowUpdating(object sender, GridViewUpdateEventArgs e)
-    {
-        SqlConnection sc = new SqlConnection();
-        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-
-        int userid = Convert.ToInt32(gdvShow.DataKeys[e.RowIndex].Value.ToString());
-        GridViewRow row = (GridViewRow)gdvShow.Rows[e.RowIndex];
-        string AmountProvided = ((System.Web.UI.WebControls.TextBox)row.FindControl("txtAmount")).Text;
-        gdvShow.EditIndex = -1;
-        sc.Open();
-
-        SqlCommand cmd = new SqlCommand("UPDATE ProviderAmount SET Amount=@amount, LastUpdate=@lastupdate, LastUpdateBy=@lastby WHERE ProviderID=@ID", sc);
-        cmd.Parameters.AddWithValue("@ID", userid);
-        cmd.Parameters.AddWithValue("@amount",Convert.ToDecimal(AmountProvided));
-        cmd.Parameters.AddWithValue("@lastupdate", DateTime.Now);
-        cmd.Parameters.AddWithValue("@lastby", Session["JobTitle"].ToString());
-        cmd.ExecuteNonQuery();
-      
-        showdata();
-
-        sc.Close();
-    }
-    protected void showdata()
-    {
-        SqlConnection sc = new SqlConnection();
-        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-        sc.Open();
-        SqlCommand show = new SqlCommand("SELECT ProviderID, ProviderAmount.TypeOfBusiness, ProviderAmount.Amount FROM ProviderAmount " +
-                "INNER JOIN Person ON ProviderAmount.ProviderID = Person.PersonID WHERE (Person.JobTitle = @title) and (Person.BusinessEntityID=@ID)", sc);
-        show.Parameters.AddWithValue("@title", Session["JobTitle"].ToString());
-        show.Parameters.AddWithValue("@ID", Convert.ToInt32(Session["BusinessEntityID"].ToString()));
-        SqlDataAdapter adapter = new SqlDataAdapter(show);
-        DataSet ds = new DataSet();
-        adapter.Fill(ds);
-        gdvShow.DataSource = ds;
-        gdvShow.DataBind();
-        sc.Close();
-    }
     protected void btnSet_Click(object sender, EventArgs e)
     {
         SqlConnection sc = new SqlConnection();
         sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
         sc.Open();
 
-        string sql = " update [dbo].[Person] set [DefaultPage] = @page where PersonID=@personID";
+        string sql = " update [dbo].[RewardProvider] set [DefaultPage] = @page,[LastUpdated] = @LastUpdated,[LastUpdatedBy] = @LastUpdatedBy where ProviderID=@personID";
         SqlCommand cmd = new SqlCommand(sql, sc);
         cmd.Parameters.AddWithValue("@personID", Session["ID"]);
         cmd.Parameters.AddWithValue("@page", dropPages.SelectedValue.ToString());
+        cmd.Parameters.AddWithValue("@LastUpdatedBy", Session["loggedIn"].ToString());
+        cmd.Parameters.AddWithValue("@LastUpdated", DateTime.Now.ToShortDateString());
         cmd.ExecuteScalar();
         sc.Close();
-    }
-
-    protected void gdvShow_PageIndexChanging(object sender, GridViewPageEventArgs e)
-    {
-        gdvShow.PageIndex = e.NewPageIndex;
-        showdata();
     }
 }

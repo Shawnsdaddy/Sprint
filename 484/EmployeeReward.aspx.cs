@@ -7,20 +7,13 @@ using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Data;
 using System.Configuration;
-using PayPal.Api;
-using PayPal.Sample.Utilities;
-using PayPal.Sample;
 
-public partial class EmployeeReward : BaseSamplePage
+public partial class EmployeeReward : System.Web.UI.Page
 {
-
+    private int businessid;
     protected void Page_Load(object sender, EventArgs e)
     {
-        HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        HttpContext.Current.Response.AddHeader("Pragma", "no-cache");
-        HttpContext.Current.Response.AddHeader("Expires", "0");
-
-        BindCalendar();
+        
         
         if (Session["loggedIn"] == null)
         {
@@ -28,76 +21,18 @@ public partial class EmployeeReward : BaseSamplePage
             gvEvents.DataSource = null;
             gvEvents.DataBind();
         }
-        else
-        {
-            switch (Session["Privilege"].ToString())
-            {
-                case "Administrative":
-                    switch (Session["DefaultPage"].ToString())
-                    {
-                        case "Homepage":
-                            Response.Redirect("CEOPostWall.aspx");
-                            break;
-                        case "ProviderInfor":
-                            Response.Redirect("CEO_AddProvider.aspx");
-                            break;
-                        case "EmployeeInfor":
-                            Response.Redirect("CreateEmployee.aspx");
-                            break;
-                        case "ViewReport":
-                            Response.Redirect("Report.aspx");
-                            break;
-                        case "Setting":
-                            Response.Redirect("CEOprofile.aspx");
-                            break;
-                        default:
-                            Response.Redirect("CEOPostWall.aspx");
-                            break;
-
-                    }
-                    break;
-                case "SystemAdmin":
-                    switch (Session["DefaultPage"].ToString())
-                    {
-                        case "Homepage":
-                            Response.Redirect("SystemAdmin.aspx");
-                            break;
-                        case "Setting":
-                            Response.Redirect("SytemAdminprofile.aspx");
-                            break;
-                        default:
-                            Response.Redirect("SystemAdmin.aspx");
-                            break;
-
-                    }
-                    break;
-                case "RewardProvider":
-                    switch (Session["DefaultPage"].ToString())
-                    {
-                        case "Homepage":
-                            Response.Redirect("RewardProvider.aspx");
-                            break;
-                        case "Setting":
-                            Response.Redirect("Providerprofile.aspx");
-                            break;
-                        default:
-                            Response.Redirect("RewardProvider.aspx");
-                            break;
-                    }
-                    break;
-                default:
-                    rewardpool();
-                    AutoCompleteExtender1.ContextKey = Session["ID"].ToString();
+        BindCalendar();
+        rewardpool();
+        AutoCompleteExtender1.ContextKey = Session["ID"].ToString() +' '+ Session["BusinessEntityID"].ToString();                
                     //updatecombox();
-                    if (!IsPostBack)
-                    {
-                        LatestUpdates();
-                        reset();
-                    }
-                    break;
-            }        
-        }
-    }
+        if (!IsPostBack)
+         {
+         LatestUpdates();
+         reset();
+         }
+
+       
+  }
 
     private void BindCalendar()
     {
@@ -108,17 +43,22 @@ public partial class EmployeeReward : BaseSamplePage
     [System.Web.Script.Services.ScriptMethod()]
     public static List<string> SearchName(string prefixText, int count, string contextKey)
     {
+
+        string[] IDs = contextKey.Split(' ');
         //Connect to Database
+
         SqlConnection sc = new SqlConnection();
         sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
         sc.Open();
         //Send Command
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = sc;
-        cmd.CommandText = "SELECT [PersonID],([FirstName] + ' ' + isnull([MI],'')+ ' ' + [LastName]+', '+[NickName]) as RewardName FROM [dbo].[Person] where (NickName like '%' + @SearchText + '%' or FirstName like '%' + @SearchText + '%' or LastName like '%' + @SearchText + '%') and status = 1 and [Privilege] = 'Employee' and PersonID != @loginID and loginCount != 0";
+        cmd.CommandText = "SELECT [PersonID],([FirstName] + ' ' + isnull([MI],'')+ ' ' + [LastName]+', '+ isnull([NickName],'')) as RewardName FROM [dbo].[Person] where (NickName like '%' + @SearchText + '%' or FirstName like '%' + @SearchText + '%' or LastName like '%' + @SearchText + '%') and status = 1 and [Privilege] = 'Employee' and PersonID != @loginID and loginCount != 0 and BusinessEntityID = @BusinessEntityID";
         //cmd.CommandText = "SELECT [FirstName] FROM[RewardSystemLab4].[dbo].[Person]  where FirstName like '%' + @SearchText + '%'";
         cmd.Parameters.AddWithValue("@SearchText", prefixText);
-        cmd.Parameters.AddWithValue("@loginID", contextKey);
+        
+        cmd.Parameters.AddWithValue("@loginID", IDs[0]);
+        cmd.Parameters.AddWithValue("@BusinessEntityID", IDs[1]);
         
         List<string> NameLists = new List<string>();
         SqlDataReader sdr = cmd.ExecuteReader();
@@ -157,6 +97,10 @@ public partial class EmployeeReward : BaseSamplePage
             {
                 Response.Write("<script>alert('Please select Value and Category')</script>");
                 popReward.Show();
+            }
+            else if (CheckRewardLimit() >=Convert.ToInt32(Session["GiveLimit"].ToString()))
+            {
+                Response.Write("<script>alert('You can Only Make "+ Session["GiveLimit"].ToString()+" Reward per day')</script>");
             }
             else
             {
@@ -203,12 +147,9 @@ public partial class EmployeeReward : BaseSamplePage
                 reader.Read();
                 Session["ReceiverEmail"] = reader["PersonEmail"].ToString();
                 sc.Close();
-                    RunSample();
                     Response.Write("<script>alert('Peer reward Successful')</script>");
                     LatestUpdates();
                     reset();
-
-
         }
                 catch
         {
@@ -229,10 +170,14 @@ public partial class EmployeeReward : BaseSamplePage
     PagedDataSource pds = new PagedDataSource();
     private void LatestUpdates()
     {
+        if (Session["ID"] != null)
+        {
 
+            businessid = Convert.ToInt32(Session["BusinessEntityID"]);
+        }
 
-        string getpost = "SELECT        isnull(Person.ReceivePrivacy, Person.NickName) AS ReceiverName, isnull(Person_1.GivePrivacy,Person_1.NickName) AS RewarderName, Category.CategoryName, Value.ValueName, PeerTransaction.RewardDate, PeerTransaction.LastUpdated, PeerTransaction.EventDescription, PeerTransaction.PointsAmount" +
-                         " FROM            Person INNER JOIN PeerTransaction ON Person.PersonID = PeerTransaction.ReceiverID INNER JOIN Value ON PeerTransaction.ValueID = Value.ValueID INNER JOIN Category ON PeerTransaction.CategoryID = Category.CategoryID INNER JOIN Person AS Person_1 ON PeerTransaction.RewarderID = Person_1.PersonID ORDER BY PeerTransaction.PointsTransactionID DESC";
+        string getpost = "SELECT        isnull(Person.ReceivePrivacy, isnull(Person.NickName,Person.FirstName)) AS ReceiverName, isnull(Person_1.GivePrivacy,isnull(Person_1.NickName,Person_1.FirstName)) AS RewarderName, Category.CategoryName, Value.ValueName, PeerTransaction.RewardDate, PeerTransaction.LastUpdated, PeerTransaction.EventDescription, PeerTransaction.PointsAmount" +
+                         " FROM            Person INNER JOIN PeerTransaction ON Person.PersonID = PeerTransaction.ReceiverID INNER JOIN Value ON PeerTransaction.ValueID = Value.ValueID INNER JOIN Category ON PeerTransaction.CategoryID = Category.CategoryID INNER JOIN Person AS Person_1 ON PeerTransaction.RewarderID = Person_1.PersonID WHERE Person.BusinessEntityID = " + businessid + "ORDER BY PeerTransaction.PointsTransactionID DESC";
 
         SqlDataAdapter da = new SqlDataAdapter(getpost, ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString);
         DataTable dt = new DataTable();
@@ -374,68 +319,6 @@ public partial class EmployeeReward : BaseSamplePage
         dlPaging.DataBind();
     }
 
-    protected override void RunSample()
-    {
-        // ### Api Context
-        // Pass in a `APIContext` object to authenticate 
-        // the call and to send a unique request id 
-        // (that ensures idempotency). The SDK generates
-        // a request id if you do not pass one explicitly. 
-        // See [Configuration.cs](/Source/Configuration.html) to know more about APIContext.
-        var apiContext = PayPal.Sample.Configuration.GetAPIContext();
-
-        // ### Initialize `Payout` Object
-        // Initialize a new `Payout` object with details of the batch payout to be created.
-        var payout = new Payout
-        {
-            // #### sender_batch_header
-            // Describes how the payments defined in the `items` array are to be handled.
-            sender_batch_header = new PayoutSenderBatchHeader
-            {
-                sender_batch_id = "batch_" + System.Guid.NewGuid().ToString().Substring(0, 8),
-                email_subject = "You have a payment"
-            },
-            // #### items
-            // The `items` array contains the list of payout items to be included in this payout.
-            // If `syncMode` is set to `true` when calling `Payout.Create()`, then the `items` array must only
-            // contain **one** item.  If `syncMode` is set to `false` when calling `Payout.Create()`, then the `items`
-            // array can contain more than one item.
-            items = new List<PayoutItem>
-                    {
-                        new PayoutItem
-                        {
-                            recipient_type = PayoutRecipientType.EMAIL,
-                            amount = new Currency
-                            {
-                                value =  Session["RewardAmount"].ToString(),
-                                currency = "USD"
-                            },
-                            receiver = Session["ReceiverEmail"].ToString() ,
-                            note = "Thank you.",
-                            sender_item_id = "item_1"
-                        }
-                      
-                    }
-        };
-
-        // ^ Ignore workflow code segment
-        #region Track Workflow
-        //this.flow.AddNewRequest("Create payout", payout);
-        #endregion
-
-        // ### Payout.Create()
-        // Creates the batch payout resource.
-        // `syncMode = false` indicates that this call will be performed **asynchronously**,
-        // and will return a `payout_batch_id` that can be used to check the status of the payouts in the batch.
-        // `syncMode = true` indicates that this call will be performed **synchronously** and will return once the payout has been processed.
-        // > **NOTE**: The `items` array can only have **one** item if `syncMode` is set to `true`.
-        var createdPayout = payout.Create(apiContext, false);
-
-        // ^ Ignore workflow code segment
-        #region Track Workflow
-        //this.flow.RecordResponse(createdPayout);
-        #endregion
-    }
     protected void Calendar1_DayRender(object sender, DayRenderEventArgs e)
     {
 
@@ -443,10 +326,7 @@ public partial class EmployeeReward : BaseSamplePage
 
     protected void Calendar1_SelectionChange(object sender, EventArgs e)
     {
-
-
         displayGV();
-
     }
     private void displayGV()
     {
@@ -455,9 +335,10 @@ public partial class EmployeeReward : BaseSamplePage
 
         sc.ConnectionString = connStr;
         sc.Open();
-        var date = Calendar1.SelectedDate.ToString("M/d/yyyy");
-        SqlCommand location2 = new SqlCommand("SELECT Date, Eventname as Event, Location FROM Calendar WHERE CONVERT(VARCHAR(10), cast(Date as date), 101) = @Date", sc);
-        location2.Parameters.AddWithValue("@Date", Convert.ToDateTime(date).Date);
+        string date = Calendar1.SelectedDate.ToString("MM/dd/yyyy");
+        SqlCommand location2 = new SqlCommand("SELECT [Date] As Time, Eventname as Event, Location FROM Calendar WHERE RIGHT('00' + CAST(DATEPART(month, [Date]) AS varchar(2)), 2) + '/' + RIGHT('00' + CAST(DATEPART(Day, [Date]) AS varchar(2)), 2) + '/' + RIGHT('0000' + CAST(DATEPART(year, [Date]) AS varchar(4)), 4) = @Date and BusinessEntityID= @BusinessEntityID", sc);
+        location2.Parameters.AddWithValue("@Date", date);
+        location2.Parameters.AddWithValue("@BusinessEntityID", Session["BusinessEntityID"]);
         SqlDataAdapter sda = new SqlDataAdapter(location2);
 
         DataTable dt = new DataTable();
@@ -465,7 +346,6 @@ public partial class EmployeeReward : BaseSamplePage
         gvEvents.DataSource = dt;
         gvEvents.DataBind();
         ModalPopupExtender1.Show();
-
 
     }
 
@@ -475,5 +355,66 @@ public partial class EmployeeReward : BaseSamplePage
         gvEvents.PageIndex = e.NewPageIndex;
         this.displayGV();
     }
+    private int CheckRewardLimit()
+    {
+        int rewardCount = 0;
+        SqlConnection sc = new SqlConnection();
+        string connStr = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
 
+        sc.ConnectionString = connStr;
+        sc.Open();
+
+
+        SqlCommand command = new SqlCommand();
+        command.Connection = sc;
+
+        command.CommandText = "SELECT RewardDate, RewarderID, COUNT(PointsTransactionID) AS RewardTime " +
+            "FROM PeerTransaction GROUP BY RewardDate, RewarderID " +
+            "HAVING  (RewardDate =(SELECT CAST(CONVERT(varchar(10), GETDATE(), 110) AS datetime) AS Expr1)) " +
+            "AND (RewarderID = @RewarderID)";
+      
+        command.Parameters.AddWithValue("@RewarderID", Convert.ToInt32(Session["ID"]));
+        SqlDataReader reader = command.ExecuteReader();
+
+        if (reader.HasRows)
+        {
+            reader.Read();
+            rewardCount =Convert.ToInt32(reader["RewardTime"].ToString());
+        }
+        else
+        {
+            rewardCount = 0;
+        }
+            return rewardCount;
+    }
+
+
+    protected void AllGrid_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        AllGrid.PageIndex = e.NewPageIndex;
+        this.displayAllEvents();
+    }
+    protected void displayAllEvents()
+    {
+        SqlConnection sc = new SqlConnection();
+        string connStr = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+
+        sc.ConnectionString = connStr;
+        sc.Open();
+        
+        SqlCommand location2 = new SqlCommand("select EventName, Date, Location from Calendar where BusinessEntityID = @BusinessEntityID", sc);
+        location2.Parameters.AddWithValue("@BusinessEntityID", Session["BusinessEntityID"]);
+        SqlDataAdapter sda = new SqlDataAdapter(location2);
+
+        DataTable dt = new DataTable();
+        sda.Fill(dt);
+        AllGrid.DataSource = dt;
+        AllGrid.DataBind();
+        //popViewAll.Show();
+    }
+
+    protected void btnViewAll_Click(object sender, EventArgs e)
+    {
+        displayAllEvents();
+    }
 }

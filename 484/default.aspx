@@ -7,75 +7,50 @@
 <head runat="server">
     <title></title>
     <link href="Style/login.css" rel="stylesheet" type="text/css" />
-
+    
+    <script src='https://www.google.com/recaptcha/api.js'></script>
     <style type="text/css">
         .auto-style1 {
-            text-align: center;
+            border-radius: 5px;
+            width: 24%;
+            position: relative;
+            transition: all 5s ease-in-out;
+            left: 0px;
+            top: 0px;
+            height: 57px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
         }
-
         .auto-style2 {
-            width: 5px;
+            border-style: none;
+            border-color: inherit;
+            border-width: medium;
+            background-color: transparent;
+            position: absolute;
+            top: 2px;
+            right: 0px;
+            font-size: 36px;
+            margin-left: 50px;
+            padding: 16px;
         }
-
         .auto-style3 {
-            color: #fff;
-            background-color: #28a745;
-            margin-left: auto;
-            margin-right: auto;
-            display: block;
-            width: 25%;
-            height: 15%;
-            margin-bottom: 5px;
-            font-weight: normal;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            border: 1px solid transparent;
-            font-size: 1rem;
-            line-height: 1.25;
-            border-radius: 0.25rem;
-            transition: all 0.15s ease-in-out;
-            position: Relative;
-            bottom: -32px;
-            left: -97px;
-        }
-
-        .auto-style4 {
-            color: #fff;
-            background-color: #28a745;
-            margin-left: auto;
-            margin-right: auto;
-            display: block;
-            width: 25%;
-            height: 15%;
-            margin-bottom: 5px;
-            font-weight: normal;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            border: 1px solid transparent;
-            font-size: 1rem;
-            line-height: 1.25;
-            border-radius: 0.25rem;
-            transition: all 0.15s ease-in-out;
-            position: Relative;
-            bottom: -4px;
-            left: 115px;
+            position: absolute;
+            top: 47%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 360px;
+            height: 361px;
+            padding: 80px 40px;
+            box-sizing: border-box;
+    /*background: rgba(0,0,0,.5);*/
         }
     </style>
 </head>
 <body>
     <form id="form1" runat="server" margin-left="auto" margin-right="auto">
-        <div class="auto-style1">
-            <asp:Login ID="Login1" runat="server" OnAuthenticate="Login1_Authenticate" Style="align-content: center" Width="428px" DestinationPageUrl="CEOPostWall.aspx">
+        <div class="auto-style3">
+            <asp:Login ID="Login1" runat="server" OnAuthenticate="Login1_Authenticate" DestinationPageUrl="CEOPostWall.aspx">
                 <LayoutTemplate>
                     <table cellpadding="1" cellspacing="0" style="border-collapse: collapse;">
                         <tr>
@@ -83,43 +58,47 @@
                                 <table cellpadding="0">
                                     <tr>
                                         <td align="center" class="td">
-                                        <asp:Image ID="Image1" runat="server" ImageUrl="~/image/ExcelLogo.png" class="rewardIcon" /></td>
+                                        <asp:Image ID="Image1" runat="server" ImageUrl="~/image/Picture2.png" class="user" /></td>
+                                       
                                     </tr>
                                     <tr>
-                                        <%--<td align="right" class="auto-style2">&nbsp;</td>--%>
-                                        <td align="center">
+                                       <%-- <td align="center">--%>
                                             <asp:TextBox ID="UserName" runat="server" CssClass="textbox" placeholder="Email Address"></asp:TextBox>
                                             <asp:RequiredFieldValidator ID="UserNameRequired" runat="server" ControlToValidate="UserName" ForeColor="Red" ErrorMessage="User Name is required." ToolTip="User Name is required." ValidationGroup="Login1">*</asp:RequiredFieldValidator>
-                                        </td>
+                                        <%--</td>--%><br />
                                     </tr>
                                     <tr>
-                                       <%-- <td align="right" class="auto-style2">&nbsp;</td>--%>
-                                        <td align="center">
+                                        <%--<td align="center">--%>
                                             <asp:TextBox ID="Password" runat="server" TextMode="Password" CssClass="textbox" placeholder="Password"></asp:TextBox>
                                             <asp:RequiredFieldValidator ID="PasswordRequired" runat="server" ControlToValidate="Password" ForeColor="Red" ErrorMessage="Password is required." ToolTip="Password is required." ValidationGroup="Login1">*</asp:RequiredFieldValidator>
-                                        </td>
+                                       <%-- </td>--%><br />
                                     </tr>
                                     <tr>
-                                        <td align="center">
-                                            <asp:CheckBox ID="RememberMe" runat="server" CssClass="td" Text="Remember me next time." />
-                                        </td>
+                                      <%--  <td align="center">--%>
+                                            <asp:CheckBox ID="RememberMe" runat="server" CssClass="td" Text="Remember Me" />
+                                       <%-- </td>--%><br />
                                     </tr>
                                     <tr>
-                                        <td align="center" style="color: Red;">
+                                        <td <%--align="center"--%> style="color: Red;">
                                             <asp:Literal ID="FailureText" runat="server" EnableViewState="False"></asp:Literal>
-                                        </td>
+                                        </td><br />
                                     </tr>
                                     <tr>
-                                        <td align="right">
+                                           <div class="g-recaptcha" data-sitekey="6Lc7q1IUAAAAAFarqQDYs1ZgXcB6TKlh_kcHzR0i"></div>
+
+                                        <%--<td align="center">--%>
+                                         
                                             <asp:Button ID="LoginButton" runat="server" CommandName="Login" CssClass="btn-login" Text="Log In" ValidationGroup="Login1" />
-                                        </td>
+                                        <asp:LinkButton  ID="btnForgotPassword" runat="server" CssClass="btn-forgot" Text="Forgot Password"></asp:LinkButton>
+                                         <ajaxToolkit:ModalPopupExtender ID="popResendPassword" runat="server" TargetControlID="btnForgotPassword" PopupControlID="divResendPass" CancelControlID="cancelPass" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
+                                        <%--</td>--%><br />
                                     </tr>
                                     <tr>
-                                        <td align="right">&nbsp;</td>
+                                        <td align="center">&nbsp;</td>
                                     </tr>
                                     <tr>
-                                        <td align="right"></td>
-                                        <td align="right"></td>
+                                        <td align="center"></td>
+                                        <td align="center"></td>
                                     </tr>
                                 </table>
 
@@ -128,38 +107,25 @@
                     </table>
                 </LayoutTemplate>
             </asp:Login>
+           
         </div>
+        
+        <br />
+      
         <div>
-            <%--<asp:Button ID="btnForgotUsername" CssClass="btn-forgot" runat="server" Text="Forgot Username" Width="130px" Height="30px" />--%>
-            <asp:Button ID="btnForgotPassword" CssClass="btn-forgot" runat="server" Text="Forgot Password" Width="130px" Height="30px" />
+             
+    <%--        <asp:Button ID="btnForgotPassword" CssClass="btn-forgot" runat="server" Text="Forgot Password"/>--%>
         </div>
 
 
         <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="True"></asp:ScriptManager>
         <%--<ajaxToolkit:ModalPopupExtender ID="popResendUserName" runat="server" TargetControlID="btnForgotUsername" PopupControlID="divResendUserName" CancelControlID="cancelEmail" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>--%>
-        <ajaxToolkit:ModalPopupExtender ID="popResendPassword" runat="server" TargetControlID="btnForgotPassword" PopupControlID="divResendPass" CancelControlID="cancelPass" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
-        <%--        <div id="divResendUserName" class="popup" style="width: 280px">
-            <asp:Table ID="tblResetEmail" runat="server" HorizontalAlign="Left" CssClass="table">
-
+        <%--<ajaxToolkit:ModalPopupExtender ID="popResendPassword" runat="server" TargetControlID="btnForgotPassword" PopupControlID="divResendPass" CancelControlID="cancelPass" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>--%>
+        <div id="divResendPass" class="popup">
+            <asp:Table ID="tblResetUserName" runat="server" HorizontalAlign="Center">
                 <asp:TableRow>
                     <asp:TableCell>
-                        <asp:TextBox ID="txtEmail" runat="server" CssClass="textbox" Width="230px" placeholder="Enter Email to receive UserName"></asp:TextBox>
-                    </asp:TableCell><asp:TableCell>
-                        <asp:RequiredFieldValidator ValidationGroup="UserName" ID="RequiredFieldValidator2" runat="server" class="auto-style8" ControlToValidate="txtEmail" ErrorMessage="*"></asp:RequiredFieldValidator>
-                        <asp:RegularExpressionValidator ValidationGroup="UserName" ID="RegularExpressionValidator2" runat="server"
-                            ControlToValidate="txtEmail" ErrorMessage="Please enter correct email"
-                            ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
-                    </asp:TableCell>
-                </asp:TableRow>
-            </asp:Table>
-            <asp:Button ID="resendEmail" ValidationGroup="UserName" runat="server" Text="Send Your UserName to Your Email" CssClass="button" OnClick="resendEmail_Click" />
-            <asp:Button ID="cancelEmail" runat="server" CssClass="btn-close" Style="background-image: url('http://icons.iconarchive.com/icons/iconsmind/outline/24/Close-icon.png'); background-repeat: no-repeat" />
-        </div>--%>
-        <div id="divResendPass" class="popup" style="width: 300px">
-            <asp:Table ID="tblResetUserName" runat="server" HorizontalAlign="Left" CssClass="table">
-                <asp:TableRow>
-                    <asp:TableCell>
-                        <asp:TextBox ID="txtResetEmail" runat="server" CssClass="textbox" Width="250" placeholder="Enter Email to receive default Password"></asp:TextBox>
+                        <asp:TextBox ID="txtResetEmail" runat="server" CssClass="popuptextbox" placeholder="Enter Email to receive default Password"></asp:TextBox>
                     </asp:TableCell><asp:TableCell>
                         <asp:RequiredFieldValidator ValidationGroup="Email" ID="RequiredFieldValidator1" runat="server" class="auto-style8" ForeColor="Red" ControlToValidate="txtResetEmail" ErrorMessage="*"></asp:RequiredFieldValidator>
                         <asp:RegularExpressionValidator ValidationGroup="UserName" ID="RegularExpressionValidator1" runat="server"

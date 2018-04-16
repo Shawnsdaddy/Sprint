@@ -39,20 +39,14 @@
             width: 300px;
             height: 140px;
         }
-        .auto-style1 {
-            width: 49px;
-            height: 53px;
-            margin-left: 1%;
-            margin-top: 1%;
-        }
-    </style>
+        </style>
 
 </head>
-<body style="width: 74%; height: 427px">
+<body>
       <form id="form2" runat="server">
       <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
             </asp:ContentPlaceHolder>
-        <div id="mySidenav" class="sidenav" style="width:10%;">
+        <div id="mySidenav" class="sidenav">
             <div class="btn-aligncenter">
             <%--<asp:Image ID="profileImage" runat="server" Height ="100" Width ="100"/>--%>
                 <asp:ImageButton ID="profileImage" runat="server" OnClick="profileImage_Click" Height ="100" Width ="100" />
@@ -61,7 +55,8 @@
                 <asp:Button runat="server" OnClick="Unnamed_Click" Text="Logout" CssClass="btn-login" CausesValidation="False"  Width="50%"></asp:Button>
                 </div>
                 <%--<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>--%>
-                <a href="RewardProvider.aspx" class="transition">Home Page</a>            
+                <a href="RewardProvider.aspx" class="transition">Home Page</a>   
+            &nbsp;<a href="GiftCardInfo.aspx" class="transition">GiftCard Info</a>
                &nbsp;<a href="Providerprofile.aspx" class="transition">Settings</a>
                       
             

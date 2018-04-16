@@ -11,7 +11,6 @@ using System.Net.Mail;
 using System.Configuration;
 using System.Data;
 
-
 public partial class CEO_AddProvider : System.Web.UI.Page
 {
 
@@ -26,143 +25,244 @@ public partial class CEO_AddProvider : System.Web.UI.Page
         {
             Response.Redirect("default.aspx");
         }
-        switch (Session["Privilege"].ToString())
-        {
-            case "Employee":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                    case "GetReward":
-                        Response.Redirect("CashOut.aspx");
-                        break;
-                    case "DashBoard":
-                        Response.Redirect("UserDashboard.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("EmployeeProfile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                }
-                break;
-            case "SystemAdmin":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("SytemAdminprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-
-                }
-                break;
-            case "RewardProvider":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("Providerprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                }
-                break;
-            default:
+       
                 if (!Page.IsPostBack)
                 {
                     GridBind();
-
                 }
-                break;
-        }      
     }
-    protected void btnAddProvider_Click(object sender, EventArgs e)
+    public void GridBind()
     {
         SqlConnection sc = new SqlConnection();
-        string connStr = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-        sc.ConnectionString = connStr;
+        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
         sc.Open();
-        RewardsProvider providerObject = new RewardsProvider(txtProviderName.Text, txtProviderEmail.Text, TypeOfBusiness.SelectedItem.Text, DateTime.Now, Session["loggedIn"].ToString(), Convert.ToInt32(Session["BusinessEntityID"].ToString()));
-        SqlCommand insertProvider = new SqlCommand();
-        insertProvider.Connection = sc;
-        insertProvider.CommandText = "select [PersonEmail] from Person where jobtitle =@ProviderName and status=1 and Privilege='RewardProvider' and BusinessEntityID = @BusinessEntityID";
-        insertProvider.Parameters.AddWithValue("@ProviderName", providerObject.getcompanyName());
-        //insertProvider.Parameters.AddWithValue("@Amount", providerObject.getamountProvided());
-        insertProvider.Parameters.AddWithValue("@TypeOfBusiness", providerObject.gettypeOfBusiness());
-        insertProvider.Parameters.AddWithValue("@BusinessEntityID", providerObject.getBusinessEntityID());
-        SqlDataReader reader = insertProvider.ExecuteReader();
+
+        // Existing
+        SqlCommand select = new SqlCommand();
+        select.Connection = sc;
+        select.CommandText = "SELECT ProviderRewards.GiftCardID, RewardProvider.ProviderName, RewardProvider.TypeOfBusiness, format(ProviderRewards.GiftCardAmount,'N2','en-us') as GiftCardAmount FROM ProviderRewards INNER JOIN RewardProvider ON ProviderRewards.ProviderID = RewardProvider.ProviderID WHERE (ProviderRewards.Status = 'Pending') AND (ProviderRewards.BusinessEntityID = @businessentityID)";
+        select.Parameters.AddWithValue("@businessentityID", Convert.ToInt32(Session["BusinessEntityID"].ToString()));
+        SqlDataAdapter da = new SqlDataAdapter(select);
+        DataTable exist = new DataTable();
+        da.Fill(exist);
+        gdvPending.DataSource = exist;
+        gdvPending.DataBind();
+
+        //New
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = sc;
+        cmd.CommandText = "SELECT ProviderRewards.GiftCardID, RewardProvider.ProviderName, RewardProvider.TypeOfBusiness, format(ProviderRewards.GiftCardAmount,'N2','en-us') as GiftCardAmount FROM ProviderRewards INNER JOIN RewardProvider ON ProviderRewards.ProviderID = RewardProvider.ProviderID WHERE (ProviderRewards.Status = 'Approved') AND (ProviderRewards.BusinessEntityID = @ID)";
+        cmd.Parameters.AddWithValue("@ID", Convert.ToInt32(Session["BusinessEntityID"].ToString()));
+        SqlDataAdapter reader = new SqlDataAdapter(cmd);
+        DataTable approve = new DataTable();
+        reader.Fill(approve);
+        gdvApproved.DataSource = approve;
+        gdvApproved.DataBind();
+
+        
+        gdvPending.SelectedIndex = -1;
+        //gdvApproved.SelectedIndex = -1;
+
+
+        //Current Provider
+        SqlCommand cmd2 = new SqlCommand();
+        cmd2.Connection = sc;
+        cmd2.CommandText = "SELECT        RewardProvider.ProviderName, RewardProvider.ProviderEmail FROM ProviderRewards INNER JOIN RewardProvider ON ProviderRewards.ProviderID = RewardProvider.ProviderID WHERE(ProviderRewards.BusinessEntityID = @BusinessEntityID) AND(ProviderRewards.Status = 'initial') AND (RewardProvider.Status = 1)";
+        cmd2.Parameters.AddWithValue("@businessentityID", Convert.ToInt32(Session["BusinessEntityID"].ToString()));
+        SqlDataAdapter cp = new SqlDataAdapter(cmd2);
+        DataTable provider = new DataTable();
+        cp.Fill(provider);
+        CurrentProvider.DataSource = provider;
+        CurrentProvider.DataBind();
+
+        sc.Close();
+    }
+
+    protected void gdvPending_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        gdvPending.PageIndex = e.NewPageIndex;
+        GridBind();
+    }
+    protected void gdvPending_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        SqlConnection sc = new SqlConnection();
+        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+        sc.Open();
+        string ID = ((System.Web.UI.WebControls.Label)gdvPending.Rows[e.RowIndex].FindControl("lblGiftCardID")).Text;
+        string name = ((System.Web.UI.WebControls.Label)gdvPending.Rows[e.RowIndex].FindControl("lblProviderName")).Text;
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = sc;
+        cmd.CommandText = "Select ProviderEmail from RewardProvider Where ProviderName = @name";
+        cmd.Parameters.AddWithValue("@name", name);
+        SqlDataReader reader = cmd.ExecuteReader();
+        if (reader.HasRows)
+        {
+            reader.Read();
+            Session["SelectedEmail"] = reader["ProviderEmail"].ToString();
+        }
+        reader.Close();
+        SqlCommand delete = new SqlCommand();
+        delete.Connection = sc;
+        delete.CommandText = "Update [dbo].[ProviderRewards] Set Status = 'Declined', LastUpdated=@lasted, LastUpdatedBy=@updatedby Where GiftCardID = @ID";
+        delete.Parameters.AddWithValue("@lasted", DateTime.Now.ToShortDateString());
+        delete.Parameters.AddWithValue("@updatedby", Session["loggedIn"]);
+        delete.Parameters.AddWithValue("@ID", Convert.ToInt32(ID));
+        delete.ExecuteNonQuery();
+        Response.Write("<script>alert('Declined Card successfully!')</script>");
+        sc.Close();
+        GridBind();
+        Send_Mail(Session["SelectedEmail"].ToString(),"Declined");
+    }
+    public void Send_Mail(String email, string status)
+    {
+        String message = "Dear Reward Provider: \n";
+        message += "Gift Card has been " + status + "!!\n";
+        MailMessage mail = new MailMessage("elkmessage@gmail.com", email, "Gift Card Status Updated ", message);
+        SmtpClient client = new SmtpClient();
+        client.EnableSsl = true;
+        client.Port = 587;
+        client.DeliveryMethod = SmtpDeliveryMethod.Network;
+        client.Credentials = new System.Net.NetworkCredential("elkmessage@gmail.com", "javapass");
+        client.Host = "smtp.gmail.com";
+        client.Send(mail);
+    }
+    public void Send_Provider(String email, string name)
+    {
+        String message = "Dear Reward Provider: \n";
+        message += "You are invited by " + name + "!!\n";
+        MailMessage mail = new MailMessage("elkmessage@gmail.com", email, "Status Updated ", message);
+        SmtpClient client = new SmtpClient();
+        client.EnableSsl = true;
+        client.Port = 587;
+        client.DeliveryMethod = SmtpDeliveryMethod.Network;
+        client.Credentials = new System.Net.NetworkCredential("elkmessage@gmail.com", "javapass");
+        client.Host = "smtp.gmail.com";
+        client.Send(mail);
+    }
+
+    protected void gdvApproved_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        SqlConnection sc = new SqlConnection();
+        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+        sc.Open();
+        string ID = ((System.Web.UI.WebControls.Label)gdvApproved.Rows[e.RowIndex].FindControl("lblGiftCardID")).Text;
+        string name = ((System.Web.UI.WebControls.Label)gdvApproved.Rows[e.RowIndex].FindControl("lblProviderName")).Text;
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = sc;
+        cmd.CommandText = "Select ProviderEmail from RewardProvider Where ProviderName = @name";
+        cmd.Parameters.AddWithValue("@name", name);
+        SqlDataReader reader = cmd.ExecuteReader();
+        if (reader.HasRows)
+        {
+            reader.Read();
+            Session["ApprovedEmail"] = reader["ProviderEmail"].ToString();
+        }
+        reader.Close();
+        SqlCommand delete = new SqlCommand();
+        delete.Connection = sc;
+        delete.CommandText = "Update [dbo].[ProviderRewards] Set Status = 'Declined', LastUpdated=@lasted, LastUpdatedBy=@updatedby Where GiftCardID = @ID";
+        delete.Parameters.AddWithValue("@lasted", DateTime.Now.ToShortDateString());
+        delete.Parameters.AddWithValue("@updatedby", Session["loggedIn"]);
+        delete.Parameters.AddWithValue("@ID", Convert.ToInt32(ID));
+        delete.ExecuteNonQuery();
+        Response.Write("<script>alert('Declined Card successfully!')</script>");
+        sc.Close();
+        GridBind();
+        Send_Mail(Session["ApprovedEmail"].ToString(), "Declined");
+    }
+
+    protected void gdvApproved_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        gdvApproved.PageIndex = e.NewPageIndex;
+        GridBind();
+    }
+    protected void btnAddNew_Click(object sender, EventArgs e)
+    {
+        SqlConnection sc = new SqlConnection();
+        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+        sc.Open();
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = sc;
+        SqlCommand insert = new SqlCommand();
+        insert.Connection = sc;
+        string name = txtProviderName.Text.Trim();
+        string email = txtProviderEmail.Text.Trim();
+        string type = TypeOfBusiness.SelectedItem.Text;
+        string password = System.Web.Security.Membership.GeneratePassword(8, 6);
+        string passwordHashNew = SimpleHash.ComputeHash(password, "MD5", null);
+        cmd.CommandText = "SELECT ProviderRewards.ProviderID, RewardProvider.ProviderEmail FROM RewardProvider INNER JOIN ProviderRewards ON RewardProvider.ProviderID = ProviderRewards.ProviderID where ProviderEmail=@email GROUP BY ProviderRewards.ProviderID, RewardProvider.ProviderEmail, ProviderRewards.BusinessEntityID HAVING (ProviderRewards.BusinessEntityID = @BusinessEntityID)";
+        cmd.Parameters.AddWithValue("@BusinessEntityID", Convert.ToInt32(Session["BusinessEntityID"].ToString()));
+        cmd.Parameters.AddWithValue("@email", email);
+        SqlDataReader reader = cmd.ExecuteReader();
 
         if (reader.HasRows)
         {
-            Response.Write("<script>alert('Provider with the same gift card amount already exists!')</script>");
-            reader.Close();
+            Response.Write("<script>alert('You already have had this Reward Provider!')</script>");
+            popAdd.Show();
         }
         else
         {
             reader.Close();
+            cmd.CommandText = "select providerID from rewardprovider where ProviderEmail=@email";
+            SqlDataReader exist = cmd.ExecuteReader();
 
-            string password = System.Web.Security.Membership.GeneratePassword(8, 6);
-            string passwordHashNew = SimpleHash.ComputeHash(password, "MD5", null);
-
-            try
+            if (exist.HasRows)
             {
-                HttpPostedFile postedFile = Picture.PostedFile;
-                string filename = Path.GetFileName(postedFile.FileName);
-                string extension = Path.GetExtension(filename);
-                if (extension.ToLower() == ".jpg" || extension.ToLower() == ".bmp" || extension.ToLower() == ".gif" || extension.ToLower() == ".png")
-                {
-                    Stream stream = postedFile.InputStream;
-                    BinaryReader binaryReader = new BinaryReader(stream);
-                    byte[] bytes = binaryReader.ReadBytes((int)stream.Length);
+                exist.Read();
+                int id = Convert.ToInt32(exist["ProviderID"].ToString());
+                exist.Close();
+                insert.CommandText = "Insert into [ProviderRewards] (ProviderID, BusinessEntityID, GiftCardAmount, Status, LastUpdated, LastUpdatedBy) " +
+                "Values(@id,@EntityID,'10','Initial',@LasteUpdated,@LastUpdatedBy)";
+                insert.Parameters.AddWithValue("@EntityID", Convert.ToInt32(Session["BusinessEntityID"].ToString()));
+                insert.Parameters.AddWithValue("@id", id);
+                insert.Parameters.AddWithValue("@LasteUpdated", DateTime.Now.ToShortDateString());
+                insert.Parameters.AddWithValue("@LastUpdatedBy", Session["loggedIn"]);
+                insert.ExecuteNonQuery();
+                Response.Write("<script>alert('Created new Reward Provider successfully!')</script>");
+                Send_Provider(email, Session["loggedIn"].ToString());
+                txtProviderEmail.Text = String.Empty;
+                txtProviderName.Text = String.Empty;
+                TypeOfBusiness.SelectedIndex = -1;
 
-                    insertProvider.Parameters.AddWithValue("@Password", passwordHashNew);
-                    //create sql query
-                    insertProvider.CommandText = "INSERT INTO [dbo].[Person] (JobTitle, PersonEmail, LastUpdated, LastUpdatedBy, Status,[Privilege],[Password],[PointsBalance],[BusinessEntityID], [loginCount],[ProfilePicture]) VALUES (@ProviderName, @ProviderEmail, @LastUpdated, @LastUpdateBy,@status,'RewardProvider',@Password,0,@BusinessEntityID,0,@ProfilePicture)";
-                    insertProvider.Parameters.AddWithValue("@ProviderEmail", providerObject.getemail());
-                    insertProvider.Parameters.AddWithValue("@LastUpdateBy", providerObject.getLastUpdatedBy());
-                    insertProvider.Parameters.AddWithValue("@LastUpdated", providerObject.getLastUpdated());
-                    insertProvider.Parameters.AddWithValue("@status", '1');
-                    insertProvider.Parameters.AddWithValue("@ProfilePicture", bytes);
-                    insertProvider.ExecuteNonQuery();
-                    insertProvider.CommandText = "INSERT INTO [dbo].[ProviderAmount] ([ProviderID],[TypeOfBusiness],[LastUpdate],[LastUpdateBy],[Amount]) VALUES ((select max(personID) from Person),@TypeOfBusiness,@LastUpdated,@LastUpdateBy,20)";
-                    insertProvider.ExecuteNonQuery();    
-                    Send_Mail(providerObject.getemail(), providerObject.getemail(), password);
+            }
+            else
+            {
+                exist.Close();
+                cmd.CommandText = "Insert into [RewardProvider] (ProviderName, ProviderEmail, TypeOfBusiness, Password, Status, LastUpdated, LastUpdatedBy) " +
+                    "Values(@name,@email,@type,@password,1,@lasted,@updatedby)";
+                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@type", type);
+                cmd.Parameters.AddWithValue("@lasted", DateTime.Now.ToShortDateString());
+                cmd.Parameters.AddWithValue("@updatedby", Session["loggedIn"]);
+                cmd.Parameters.AddWithValue("@password", passwordHashNew);
+                cmd.ExecuteNonQuery();
 
-                    sc.Close();
-                    txtProviderName.Text = string.Empty;
-                    txtProviderEmail.Text = string.Empty;
-                    TypeOfBusiness.SelectedIndex = -1;
-                    Picture.Attributes.Clear();
-                    GridBind();
-                    Response.Write("<script>alert('New provider added successfully')</script>");
-                }
-                else
-                {
-                    Response.Write("<script>alert('Only .jpg/.bmp/.gif/.png file can be upload')</script>");
-                }
+                insert.CommandText = "Insert into [ProviderRewards] (ProviderID, BusinessEntityID, GiftCardAmount, Status, LastUpdated, LastUpdatedBy) " +
+                            "Values((select Max(ProviderID) from [RewardProvider]),@businessID,'10','Initial',@last,@by)";
+                insert.Parameters.AddWithValue("@businessID", Convert.ToInt32(Session["BusinessEntityID"].ToString()));
+                insert.Parameters.AddWithValue("@last", DateTime.Now.ToShortDateString());
+                insert.Parameters.AddWithValue("@by", Session["loggedIn"]);
+                insert.ExecuteNonQuery();
+
+                Response.Write("<script>alert('Created new Reward Provider successfully!')</script>");
+                Send_MailProvider(email, Session["loggedIn"].ToString(), email, password);
+                txtProviderEmail.Text = String.Empty;
+                txtProviderName.Text = String.Empty;
+                TypeOfBusiness.SelectedIndex = -1;
+                CurrentProvider.Visible = true;
+                Response.Redirect("CEO_AddProvider.aspx");
+            }           
         }
-            catch
-        {
-            Response.Write("<script>alert('Picture Size is exceeding the databases capability')</script>");
-        }
 
+        sc.Close();
+        gdvApproved.Visible = true;
+        gdvPending.Visible = true;
+        
     }
-    }
-
-    public void Send_Mail(String email, String Name, String Password)
+    public void Send_MailProvider(String email, string CEOName, string Name, string Password)
     {
         String message = "Dear Reward Provider: \n";
-        message += "Your account has been created!!\n";
+        message += "You have been invited into the company by " + CEOName + "!!\n";
         message += "Please login with UserName and Password provides below:\n";
         message += "UserName:  " + Name + "\n PassWord: " + Password + "\n";
         MailMessage mail = new MailMessage("elkmessage@gmail.com", email, "Your Account Has been Created(DO NOT REPLY)", message);
@@ -174,251 +274,56 @@ public partial class CEO_AddProvider : System.Web.UI.Page
         client.Host = "smtp.gmail.com";
         client.Send(mail);
     }
-    protected void btnUpdateProvider_Click(object sender, EventArgs e)
+    protected void btnApprove_Click(object sender, EventArgs e)
     {
-        if (gdvShow.SelectedValue == null)
+        if (gdvPending.SelectedValue == null)
         {
-            Response.Write("<script>alert('Please select an employee')</script>");
+            Response.Write("<script>alert('Please select a gift card')</script>");
         }
         else
         {
-            int selectID = Convert.ToInt32(gdvShow.SelectedRow.Cells[0].Text);
+            int selectID = Convert.ToInt32(gdvPending.SelectedValue.ToString());
+            string name = gdvPending.SelectedRow.Cells[1].Text;
 
-            RewardsProvider providerObject = new RewardsProvider(txtprovider.Text, txtPEmail.Text, Bussiness.SelectedItem.Text, DateTime.Now, Session["loggedIn"].ToString(), Convert.ToInt32(Session["BusinessEntityID"].ToString()));
             SqlConnection sc = new SqlConnection();
             sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
             sc.Open();
-            SqlCommand insert = new SqlCommand();
-            insert.Connection = sc;
-            insert.CommandText = "select [PersonEmail] from [Person] where [PersonID] = @ProviderID";
-            insert.Parameters.AddWithValue("@ProviderID", selectID);
-            SqlDataReader reader = insert.ExecuteReader();
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = sc;
+            cmd.CommandText = "Select ProviderEmail from RewardProvider Where ProviderName = @name";
+            cmd.Parameters.AddWithValue("@name", name);
+            SqlDataReader reader = cmd.ExecuteReader();
 
-            if (reader.Read())
+            if (reader.HasRows)
             {
-                Session["ProviderEmail"] = reader["PersonEmail"].ToString();
+                reader.Read();
+                Session["SelectedPendingEmail"] = reader["ProviderEmail"].ToString();
             }
-
             reader.Close();
-            insert.CommandText = "UPDATE [dbo].[Person] SET JobTitle = @JobTitle, PersonEmail = @Email, LastUpdated = @LastUpdated, LastUpdatedBy=@LastUpdatedBy where PersonID=@ProviderID";        
-            insert.Parameters.AddWithValue("@JobTitle", providerObject.getcompanyName());
-            insert.Parameters.AddWithValue("@LastUpdatedBy", providerObject.getLastUpdatedBy());
-            insert.Parameters.AddWithValue("@LastUpdated", providerObject.getLastUpdated());
-            insert.Parameters.AddWithValue("@Email", providerObject.getemail());
-            insert.ExecuteNonQuery();
 
-            insert.CommandText = "UPDATE [dbo].[ProviderAmount] SET [TypeOfBusiness]=@TypeOfBusiness, [LastUpdate]=@LastUpdated, [LastUpdateBy]=@LastUpdatedBy WHERE [ProviderID] = @ProviderID";
-            insert.Parameters.AddWithValue("@TypeOfBusiness", providerObject.gettypeOfBusiness());
-            insert.ExecuteNonQuery();
-            if (txtPEmail.Text.Trim() == Session["ProviderEmail"].ToString())
-            {
-                HttpPostedFile postedFile = Photo.PostedFile;
-                if (postedFile != null)
-                {
-                    try
-                    {
-                        string filename = Path.GetFileName(postedFile.FileName);
-                        string extension = Path.GetExtension(filename);
-                        if (extension.ToLower() == ".jpg" || extension.ToLower() == ".bmp" || extension.ToLower() == ".gif" || extension.ToLower() == ".png")
-                        {
-                            Stream stream = postedFile.InputStream;
-                            BinaryReader binaryReader = new BinaryReader(stream);
-                            byte[] bytes = binaryReader.ReadBytes((int)stream.Length);
-
-                            SqlCommand cmd = new SqlCommand();
-                            cmd.Connection = sc;
-                            cmd.CommandText = "UPDATE [dbo].[Person] SET [ProfilePicture] = @ProfilePicture WHERE PersonID=@ProviderID";
-                            cmd.Parameters.AddWithValue("@ProfilePicture", bytes);
-                            cmd.Parameters.AddWithValue("@ProviderID", selectID);
-                            cmd.ExecuteNonQuery();
-                            sc.Close();
-                        }
-                        Response.Write("<script>alert('Information has been updated')</script>");
-                }
-                    catch
-                {
-                    Response.Write("<script>alert('Picture Size is exceeding the database can take')</script>");
-                }
-            }
-            }
-            else
-            {
-                string password = System.Web.Security.Membership.GeneratePassword(9, 1);
-                string passwordHashNew = SimpleHash.ComputeHash(password, "MD5", null);
-                insert.CommandText = "UPDATE [dbo].[Person] SET [Password]=@Password where PersonID=@EmployeeID";
-                insert.Parameters.AddWithValue("@Password", passwordHashNew);
-                insert.Parameters.AddWithValue("@EmployeeID", selectID);
-                insert.ExecuteNonQuery();
-                Send_Mail(providerObject.getemail(), providerObject.getemail(), password);
-                Response.Write("<script>alert('An E-mail has been send to new Address')</script>");
-            }
-            sc.Close();
-            }
+            SqlCommand select = new SqlCommand();
+            select.Connection = sc;
+            select.CommandText = "Update [dbo].[ProviderRewards] Set Status = @status,LastUpdated=@lasted, LastUpdatedBy=@updatedby Where GiftCardID = @ID";
+            select.Parameters.AddWithValue("@ID", selectID);
+            select.Parameters.AddWithValue("@lasted", DateTime.Now.ToShortDateString());
+            select.Parameters.AddWithValue("@updatedby", Session["loggedIn"]);
+            select.Parameters.AddWithValue("@status", "Approved");
+            select.ExecuteNonQuery();
             GridBind();
-        }
-
-
-    
-
-
-    public void ShowEmpImage(string id)
-    {
-        SqlConnection sc = new SqlConnection();
-        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-        sc.Open();
-        string sql = "SELECT [ProfilePicture] FROM Person WHERE PersonID = @ID";
-        SqlCommand cmd = new SqlCommand(sql, sc);
-        cmd.Parameters.AddWithValue("@ID", id);
-        SqlDataReader dr = cmd.ExecuteReader();
-        if (dr.HasRows)
-        {
-            while (dr.Read())
-            {
-                if (!Convert.IsDBNull(dr["ProfilePicture"]))
-                {
-                    Byte[] imagedata = (byte[])dr["ProfilePicture"];
-                    string img = Convert.ToBase64String(imagedata, 0, imagedata.Length);
-                    ProfilePicture.ImageUrl = "data:image/png;base64," + img;
-                }
-                else
-                {
-                    ProfilePicture.ImageUrl = "~/image/empty.png";
-                }
-            }
-
-
-        }
-        sc.Close();
-    }
-    public void GridBind()
-    {
-        SqlConnection sc = new SqlConnection();
-        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-        sc.Open();
-        SqlCommand fill =new SqlCommand();
-        fill.Connection = sc;
-        fill.CommandText = "SELECT ProviderAmount.ProviderID, Person.JobTitle AS Name,Person.PersonEmail AS Email, ProviderAmount.TypeOfBusiness AS Type FROM Person " +
-            "INNER JOIN ProviderAmount ON Person.PersonID = ProviderAmount.ProviderID WHERE (Person.Status = 1) AND (Person.BusinessEntityID = @businessentity)";
-        fill.Parameters.AddWithValue("@businessentity", Convert.ToInt32(Session["BusinessEntityID"].ToString()));
-        SqlDataAdapter adapter = new SqlDataAdapter(fill);
-
-        DataSet ds = new DataSet();
-        adapter.Fill(ds);
-
-        gdvShow.DataSource = ds;
-        gdvShow.DataBind();
-        sc.Close();
-        gdvShow.SelectedIndex = -1;
-    }
-
-    protected void btnSearch_Click(object sender, EventArgs e)
-    {
-        SqlConnection sc = new SqlConnection();
-        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-        sc.Open();
-        SqlCommand fill = new SqlCommand();
-        fill.Connection = sc;
-
-        string companyname = txtCompany.Text;
-        string companyemail = txtemail.Text;
-
-        fill.CommandText = "SELECT ProviderAmount.ProviderID, Person.JobTitle AS Name,Person.PersonEmail AS Email, ProviderAmount.TypeOfBusiness AS Type, ProviderAmount.Amount FROM Person " +
-            "INNER JOIN ProviderAmount ON Person.PersonID = ProviderAmount.ProviderID WHERE (Person.Status = 1)  and (Person.BusinessEntityID = @businessentity) and ((Person.JobTitle like '%'+@name+'%') and (Person.PersonEmail like+'%'+@email+'%'))";
-        fill.Parameters.AddWithValue("@name", companyname);
-        fill.Parameters.AddWithValue("@email", companyemail);
-        fill.Parameters.AddWithValue("@businessentity", Convert.ToInt32(Session["BusinessEntityID"].ToString()));
-
-        SqlDataAdapter adapter = new SqlDataAdapter(fill);
-        DataSet ds = new DataSet();
-        adapter.Fill(ds);
-        gdvShow.DataSource = ds;
-        gdvShow.DataBind();
-        sc.Close();
-        gdvShow.SelectedIndex = -1;
-    }
-
-    protected void btnRemove_Click(object sender, EventArgs e)
-    {
-        if (gdvShow.SelectedValue == null)
-        {
-            Response.Write("<script>alert('Please select an employee')</script>");
-        }
-        else
-        {
-            int ID = Convert.ToInt32(gdvShow.SelectedRow.Cells[0].Text);
-
-            SqlConnection sc = new SqlConnection();
-            sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-            sc.Open();
-            SqlCommand delete = new SqlCommand();
-            delete.Connection = sc;
-            delete.CommandText = "UPDATE [dbo].[Person] SET [status]=0 where PersonID=@ID";
-            delete.Parameters.AddWithValue("@ID", ID);
-            SqlDataAdapter adapter = new SqlDataAdapter(delete);
-            DataSet ds = new DataSet();
-            adapter.Fill(ds);
-            gdvShow.DataSource = ds;
-            //gdvShow.DataBind();
+            Response.Write("<script>alert('Approved Card successfully!')</script>");
+            //Send_Mail(Session["SelectedPendingEmail"].ToString(), "Approved");
             sc.Close();
-            GridBind();
+            
         }
-    }
-
-    protected void gdvShow_PageIndexChanging(object sender, GridViewPageEventArgs e)
-    {
-        gdvShow.PageIndex = e.NewPageIndex;
-        GridBind();
-    }
-
-    protected void btnUpdate_Click(object sender, EventArgs e)
-    {
+        gdvApproved.Visible = true;
+        gdvPending.Visible = true;
 
     }
 
-    protected void gdvShow_SelectedIndexChanged1(object sender, EventArgs e)
+
+    protected void btnCurrent_Click(object sender, EventArgs e)
     {
-        if(gdvShow.SelectedIndex == -1)
-        {
-            txtprovider.Text = string.Empty;
-            txtPEmail.Text = string.Empty;
-            Bussiness.SelectedIndex = 0;
-            Photo.Attributes.Clear();
-            ProfilePicture.Attributes.Clear();
-        }
-        else
-        {
-         String ID = gdvShow.SelectedRow.Cells[0].Text;
-
-        txtprovider.Text = gdvShow.SelectedRow.Cells[1].Text;
-
-
-        txtPEmail.Text = gdvShow.SelectedRow.Cells[2].Text;
-
-        if (gdvShow.SelectedRow.Cells[3].Text.Equals("Restaurant"))
-        {
-            Bussiness.SelectedIndex = 1;
-        }
-        else if (gdvShow.SelectedRow.Cells[3].Text.Equals("Lodging"))
-        {
-            Bussiness.SelectedIndex = 2;
-        }
-
-        if (gdvShow.SelectedRow.Cells[3].Text.Equals("Clothing"))
-        {
-            Bussiness.SelectedIndex = 3;
-        }
-        else if (gdvShow.SelectedRow.Cells[3].Text.Equals("Shopping"))
-        {
-            Bussiness.SelectedIndex = 4;
-        }
-        else if (gdvShow.SelectedRow.Cells[3].Text.Equals("Other"))
-        {
-            Bussiness.SelectedIndex = 5;
-        }
-
-        ShowEmpImage(ID);
-        }
-
+        CurrentProvider.Visible = true;
     }
 }
 

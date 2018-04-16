@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Configuration;
 using System.Windows.Forms;
+using PayPal.Api;
 
 public partial class RewardProviderMasterPage : System.Web.UI.MasterPage
 {
@@ -51,16 +52,20 @@ public partial class RewardProviderMasterPage : System.Web.UI.MasterPage
                 switch (Session["DefaultPage"].ToString())
                 {
                     case "Homepage":
+                        Response.Redirect("SystemAdminHome.aspx");
+                        break;
+                    case "UserInfo":
                         Response.Redirect("SystemAdmin.aspx");
                         break;
-                    case "Setting":
+                    case "Settings":
                         Response.Redirect("SytemAdminprofile.aspx");
                         break;
                     default:
-                        Response.Redirect("SystemAdmin.aspx");
+                        Response.Redirect("SystemAdminHome.aspx");
                         break;
 
                 }
+
                 break;
             case "Employee":
                 switch (Session["DefaultPage"].ToString())
@@ -88,8 +93,7 @@ public partial class RewardProviderMasterPage : System.Web.UI.MasterPage
                 con.Open();
                 SqlCommand command = new SqlCommand();
                 command.Connection = con;
-
-                txtName.Text = Session["JobTitle"].ToString();
+                txtName.Text = Session["ProviderName"].ToString();
                 profilePicture();
                 con.Close();
                 break;
@@ -110,7 +114,7 @@ public partial class RewardProviderMasterPage : System.Web.UI.MasterPage
         SqlConnection sc = new SqlConnection();
         sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
         sc.Open();
-        string sql = "SELECT [ProfilePicture] FROM person WHERE PersonEmail = @PersonEmail";
+        string sql = "SELECT [ProfilePicture] FROM [RewardProvider] WHERE [ProviderEmail] = @PersonEmail";
         SqlCommand cmd = new SqlCommand(sql, sc);
         cmd.Parameters.AddWithValue("@PersonEmail", Session["E-mail"]);
         SqlDataReader dr = cmd.ExecuteReader();

@@ -176,7 +176,8 @@
                        </asp:ListItem>
                         <asp:ListItem Text="Home Page" Value="Homepage">
                         </asp:ListItem>
-                       
+                       <asp:ListItem Text="User Info" Value="UserInfo">
+                       </asp:ListItem>
                            <asp:ListItem Text="Setting" Value="Setting">
                        </asp:ListItem>
 

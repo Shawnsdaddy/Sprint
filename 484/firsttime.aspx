@@ -59,9 +59,10 @@
                             </tr>
                     </td>
                 </tr>
+                
                 <tr>
                     <td align="center" colspan="2">
-                        <asp:Button runat="server" ValidationGroup="Change" CssClass="button" OnClick="btnSave_Click" ID="btnSave" Text="Save" OnClientClick="if (!confirm('You have only one chance to modify your username! Please double check')) return false" />
+                        <asp:Button runat="server" ValidationGroup="Change" CssClass="button" OnClick="btnSave_Click" ID="btnSave" Text="Save"  />
                     </td>
                 </tr>
                 <tr>

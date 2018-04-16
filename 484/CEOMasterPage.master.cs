@@ -9,13 +9,15 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Configuration;
 using System.Windows.Forms;
+using System.Net.Mail;
+//using Tulpep.NotificationWindow;
 
 public partial class MasterPage : System.Web.UI.MasterPage
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-     
-    HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+       
+        HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         HttpContext.Current.Response.AddHeader("Pragma", "no-cache");
         HttpContext.Current.Response.AddHeader("Expires", "0");
         if (Session["loggedIn"] == null)
@@ -48,22 +50,29 @@ public partial class MasterPage : System.Web.UI.MasterPage
                 switch (Session["DefaultPage"].ToString())
                 {
                     case "Homepage":
+                        Response.Redirect("SystemAdminHome.aspx");
+                        break;
+                    case "UserInfo":
                         Response.Redirect("SystemAdmin.aspx");
                         break;
-                    case "Setting":
+                    case "Settings":
                         Response.Redirect("SytemAdminprofile.aspx");
                         break;
                     default:
-                        Response.Redirect("SystemAdmin.aspx");
+                        Response.Redirect("SystemAdminHome.aspx");
                         break;
 
                 }
+
                 break;
             case "RewardProvider":
                 switch (Session["DefaultPage"].ToString())
                 {
                     case "Homepage":
                         Response.Redirect("RewardProvider.aspx");
+                        break;
+                    case "GiftCardInfo":
+                        Response.Redirect("GiftCardInfo.aspx");
                         break;
                     case "Setting":
                         Response.Redirect("Providerprofile.aspx");
@@ -72,23 +81,45 @@ public partial class MasterPage : System.Web.UI.MasterPage
                         Response.Redirect("RewardProvider.aspx");
                         break;
                 }
+
                 break;
             default:
                 SqlConnection con = new SqlConnection();
                 con.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
                 con.Open();
-                SqlCommand command = new SqlCommand();
-                command.Connection = con;
+                SqlCommand alert = new SqlCommand();
+                alert.Connection = con;
 
-                //command.CommandText = "select mi,lastname from person where person.[PersonEmail] = @Email";
-                //command.Parameters.AddWithValue("@Email", Session["E-mail"].ToString());
-                //SqlDataReader reader = command.ExecuteReader();
-                //if (reader.HasRows)
-                //{
-                //    reader.Read();
-                //    Session["Middle"] = reader["MI"].ToString();
-                //    Session["last"] = reader["LastName"].ToString();
-                //}
+
+                alert.CommandText = "SELECT BusinessEntity.AlertBalance, Person.PointsBalance FROM BusinessEntity INNER JOIN Person ON" +
+                    " BusinessEntity.BusinessEntityID = Person.BusinessEntityID where [dbo].[Person].PersonID= @id and Person.BusinessEntityID=@EntityID";
+                alert.Parameters.AddWithValue("@id", Session["ID"]);
+                alert.Parameters.AddWithValue("@EntityID", Session["BusinessEntityID"]);
+
+
+
+                SqlDataReader dr = alert.ExecuteReader();
+
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    int leftbalance = Convert.ToInt32(dr["PointsBalance"].ToString());
+                    int alertamount = Convert.ToInt32(dr["AlertBalance"].ToString());
+                    if (!Page.IsPostBack)
+                    {
+                        if (leftbalance <= alertamount)
+                        {
+                            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                            sb.Append(@"<script language='javascript'>");
+                            sb.Append(@"Sendalert();");
+                            sb.Append(@"</script>");
+                            System.Web.UI.ScriptManager.RegisterStartupScript(this, this.GetType(), "JCall1", sb.ToString(), false);
+                            Send_Mail(Session["E-Mail"].ToString(), "Dear " + Session["FirstName"] + ",<br />&nbsp;<br />&nbsp;The Money Pool is too low, Please Frontload on time!<br />&nbsp;<br />&nbsp;<br />" +
+                               "Please go to this link: http://reward.us-east-1.elasticbeanstalk.com/CEOPostWall.aspx ");
+
+                        }
+                    }
+                }
                 txtName.Text = Session["FirstName"].ToString() + " " + Session["Middle"].ToString() + " " + Session["last"].ToString();
                 profilePicture();
                 con.Close();
@@ -105,7 +136,7 @@ public partial class MasterPage : System.Web.UI.MasterPage
 
     public void profilePicture()
     {
-
+       
         SqlConnection sc = new SqlConnection();
         sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
         sc.Open();
@@ -151,4 +182,18 @@ public partial class MasterPage : System.Web.UI.MasterPage
     {
         Response.Redirect("CEOprofile.aspx");
     }
+
+    public void Send_Mail(String email, String Message)
+    {
+        MailMessage mail = new MailMessage("elkmessage@gmail.com", email, "Important Information(DO NOT REPLY)", Message);
+        SmtpClient client = new SmtpClient();
+        mail.IsBodyHtml = true;
+        client.EnableSsl = true;
+        client.Port = 587;
+        client.DeliveryMethod = SmtpDeliveryMethod.Network;
+        client.Credentials = new System.Net.NetworkCredential("elkmessage@gmail.com", "javapass");
+        client.Host = "smtp.gmail.com";
+        client.Send(mail);
+    }
+
 }

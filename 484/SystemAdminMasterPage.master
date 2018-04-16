@@ -60,9 +60,10 @@
                 <asp:Label ID="txtName" runat="server" Text="" CssClass="txt"></asp:Label>
                 <asp:Button runat="server" OnClick="Unnamed_Click" Text="Logout" CssClass="btn-login" CausesValidation="False" Width="50%"></asp:Button>
                 </div>
-                <%--<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>--%>
-                <a href="SystemAdmin.aspx" class="transition">Home Page</a>            
-               &nbsp;<a href="SytemAdminprofile.aspx" class="transition">Settings</a>
+                <%--<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>--%>            
+            <a href="SystemAdminHome.aspx" class="transition">Add Users</a>            
+               &nbsp;<a href="SystemAdmin.aspx" class="transition">Manage Users</a>                                
+               &nbsp;<a href="SytemAdminprofile.aspx" class="transition">Setting</a>
                       
             
         </div> 
@@ -70,8 +71,7 @@
         <div id="main" class="content">
             <asp:ContentPlaceHolder ID="ContentPlaceHolder2" runat="server">
             </asp:ContentPlaceHolder>
-            <asp:ContentPlaceHolder ID="ContentPlaceHolder3" runat="server">
-            </asp:ContentPlaceHolder>
+            
         </div>
             <div class="footer">
             </div>            

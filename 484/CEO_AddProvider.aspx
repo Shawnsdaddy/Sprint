@@ -3,7 +3,6 @@
 <%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="ajaxToolkit" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
-    &nbsp;
     <style type="text/css">
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,8 +11,7 @@
         .btn {
             color: #fff;
             background-color: #17468A;
-            border-color: #17468A;
-            width: 20%;
+            width: auto;
             height: 30px;
             font-weight: normal;
             text-align: center;
@@ -30,9 +28,19 @@
             transition: all 0.15s ease-in-out;
             position: relative;
             float: left;
+            top: 0px;
+            left: 1px;
         }
 
-        .mybutton {
+        #label {
+            display: inline-block;
+        }
+
+        table {
+            margin: auto;
+        }
+
+        /*.mybutton {
             border-width: 0;
             border-style: none;
             background-color: #B3C100;
@@ -40,7 +48,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: medium;
             color: white;
-        }
+        }*/
 
         .header {
             background-color: #B3C100;
@@ -70,235 +78,322 @@
             text-align: center;
         }
 
-        .auto-style11 {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-            border: 1px solid #fff;
-            padding: 3px;
-            background-color: transparent;
+        .mydatagrid {
+            border: 1px solid #fff
         }
-        .mydatagrid
-        {
-           border:1px solid #fff
-        }
-         .rounded-corners
-        {
+
+        .rounded-corners {
             border: 1px solid #fff;
             -webkit-border-radius: 8px;
             -moz-border-radius: 8px;
             border-radius: 8px;
             overflow: hidden;
         }
-        .header{
+
+        .header {
             background-color: #B3C100;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: white;
             border: none 0px transparent;
             height: 25px;
             text-align: center;
-            font-size: 20px;           
+            font-size: 20px;
         }
-        .rows{
+
+        .rows {
             background-color: #fff;
-            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 15px;
             color: #000;
             min-height: 25px;
             text-align: center;
             border: none 0px transparent;
         }
-        .rows:hover{
+
+            .rows:hover {
+                background-color: #EAEDED;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                color: #666262;
+                text-align: center;
+            }
+
+        .selectedrow {
             background-color: #EAEDED;
-            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #666262;
-            text-align: center;
-        }
-        .selectedrow{
-            background-color: #EAEDED;
-            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-weight: bold;
             text-align: center;
         }
-        .mydatagrid{
+
+        .mydatagrid {
             background-color: white;
             padding: 5px 5px 5px 5px;
             color: #fff;
             text-decoration: none;
             font-weight: bold;
         }
-        .mydatafrid a:hover{
+
+        .mydatafrid a:hover {
             background-color: #000;
             color: #566573;
         }
-        .mydatagrid span{
+
+        .mydatagrid span {
             background-color: #bece02;
             color: #000;
             padding: 5px 5px 5px 5px;
-
         }
-        .pager{
+
+        .pager {
             background-color: #B3C100;
-            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: white;
             height: 30px;
             text-align: center;
-
         }
-        .mydatagrid td{
+
+        .mydatagrid td {
             padding: 5px;
         }
-        .mydatagrid th{
+
+        .mydatagrid th {
             padding: 5px;
         }
-    .auto-style13 {
-        border: 1px solid #fff;
-        -webkit-border-radius: 8px;
-        -moz-border-radius: 8px;
-        border-radius: 8px;
-        overflow: hidden;
-        text-align: center;
-    }
-    </style>
-    <script type="text/javascript">
-        function myselection(rbtnid) {
-            var rbtn = document.getElementById(rbtnid);
-            var rbtnlist = document.getElementsByTagName("input");
-            for (i = 0; i < rbtnlist.length; i++) {
-                if (rbtnlist[i].text == "radio" && rbtnlist[i].id != rbtn.id) {
-                    rbtnlist[i].checked = false;
 
-                }
+        #pending {
+            float: left;
+            width: 50%;
+            margin-left: 3%;
+        }
+
+        #approve {
+            float: right;
+            width: 46%;
+        }
+
+        @media screen and (min-width:760px) and (max-width: 1023px) {
+            .rows {
+                font-size: 10px;
+                height: auto;
+            }
+
+            .header {
+                border: none 0px transparent;
+                height: 15px;
+                text-align: center;
+                font-size: 14px;
+            }
+
+            #main {
+                padding: 10px;
+            }
+
+            .btn {
+                font-size: 12px;
             }
         }
-    </script>
 
-    <br />
-    <h2>
-        <asp:Label runat="server" Text="Provider Information" ID="lblTitle" CssClass="reward-points" Width="30%" Font-Size="X-Large" ForeColor="#17468A"></asp:Label></h2>
+        @media screen and (max-width: 759px) {
+            #main {
+                padding: 0;
+            }
+
+            .rows {
+                font-size: 10px;
+                height: auto;
+            }
+
+            .btn {
+                font-size: 12px;
+                display: inline;
+                margin: auto;
+            }
+
+            #pending {
+                width: 100%;
+                margin: auto;
+                display: inline;
+            }
+
+            #approve {
+                position: relative;
+                float: none;
+                display: inline;
+            }
+        }
+    </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder2" runat="Server">
+    <h2>
+        <asp:Label runat="server" Text="Provider Information" ID="lblTitle" CssClass="reward-points" Font-Size="X-Large" ForeColor="#17468A"></asp:Label></h2>
     <div class="btn-aligncenter" style="width: 90%;"></div>
-    <div style="margin-right: 15%; margin-left: 15%; text-align: center;">
-        <asp:Table ID="Table1" runat="server" CellPadding="3" CellSpacing="5" HorizontalAlign ="Center">
-            <asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="lblCompany" runat="server" Text="Search by Name"></asp:Label>
-                </asp:TableCell>
-                <asp:TableCell></asp:TableCell>
-                <asp:TableCell>
-                    <asp:Label ID="lblemail" runat="server" Text="Search by E-mail"></asp:Label>
-                </asp:TableCell>
-            </asp:TableRow>
-            <asp:TableRow>
-                <asp:TableCell>
-                    <asp:TextBox ID="txtCompany" runat="server" Width="180px"></asp:TextBox>
-                </asp:TableCell>
-                <asp:TableCell>
-                    <asp:Label ID="Label1" runat="server" Text="or" ForeColor="LightGray"></asp:Label>
-                </asp:TableCell>
-                <asp:TableCell>
-                    <asp:TextBox ID="txtemail" runat="server" Width="180px" ></asp:TextBox>
-                </asp:TableCell>
-                <asp:TableCell>
+    <br />
+    <div id="pending">
+        <table>
+            <tr>
+                <td>
+                    <asp:Label ID="Label1" runat="server" Font-Size="Larger" Text="Pending Gift Card" CssClass="lable" ForeColor="SlateGray"></asp:Label>
 
-                </asp:TableCell>
-                <asp:TableCell>
-                    <asp:Button ID="btnSearch" runat="server" Text="Search" Width="150px" CssClass="btn" OnClick="btnSearch_Click" />
-                </asp:TableCell>
-            </asp:TableRow>
-        </asp:Table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:GridView ID="gdvPending" ForeColor="#333333" runat="server" CellPadding="3" GridLines="None" AutoGenerateColumns="False" AllowPaging="True" DataKeyNames="GiftCardID" OnRowDeleting="gdvPending_RowDeleting" OnPageIndexChanging="gdvPending_PageIndexChanging" CellSpacing="1">
+                        <AlternatingRowStyle BackColor="White" ForeColor="#284775" CssClass="rows" />
+                        <Columns>
+                            <asp:TemplateField HeaderText="GiftCardID" Visible="false">
+                                <ItemTemplate>
+                                    <asp:Label ID="lblGiftCardID" runat="server" Text='<%# Eval("GiftCardID") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderText="ProviderName">
+                                <ItemTemplate>
+                                    <asp:Label ID="lblProviderName" runat="server" Text='<%# Eval("ProviderName") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderText="Type">
+                                <ItemTemplate>
+                                    <asp:Label ID="lblTypeOfBusiness" runat="server" Text='<%# Eval("TypeOfBusiness") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderText="Amount">
+                                <ItemTemplate>
+                                    <asp:Label ID="lblGiftCardAmount" runat="server" Text='<%# Eval("GiftCardAmount") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:CommandField ShowSelectButton="True" />
+                            <asp:CommandField DeleteText="Decline" ShowDeleteButton="True" />
+                        </Columns>
+                        <EditRowStyle BackColor="#999999" />
+                        <EmptyDataTemplate>No Record Found</EmptyDataTemplate>
+                        <EmptyDataRowStyle ForeColor="#999999" HorizontalAlign="Center" />
+                        <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                        <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                        <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                        <RowStyle BackColor="#F7F6F3" ForeColor="#333333" CssClass="rows" />
+                        <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+                        <SortedAscendingCellStyle BackColor="#E9E7E2" />
+                        <SortedAscendingHeaderStyle BackColor="#506C8C" />
+                        <SortedDescendingCellStyle BackColor="#FFFDF8" />
+                        <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
+
+                    </asp:GridView>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Button ID="btnApprove" runat="server" OnClick="btnApprove_Click" Text="Approve" CssClass="btn" />
+
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="approve">
+        <table>
+            <tr>
+                <td>
+                    <asp:Label ID="Label2" runat="server" Font-Size="Larger" Text="Approved Gift Card" ForeColor="SlateGray"></asp:Label>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:GridView ID="gdvApproved" ForeColor="#333333" runat="server" CellPadding="3" GridLines="None" AutoGenerateColumns="False" AllowPaging="True" OnPageIndexChanging="gdvApproved_PageIndexChanging" OnRowDeleting="gdvApproved_RowDeleting" CellSpacing="1">
+                        <AlternatingRowStyle BackColor="White" ForeColor="#284775" CssClass="rows" />
+                        <Columns>
+                            <asp:TemplateField HeaderText="GiftCardID" Visible="false">
+                                <ItemTemplate>
+                                    <asp:Label ID="lblGiftCardID" runat="server" Text='<%# Eval("GiftCardID") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderText="ProviderName">
+                                <ItemTemplate>
+                                    <asp:Label ID="lblProviderName" runat="server" Text='<%# Eval("ProviderName") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderText="Type">
+                                <ItemTemplate>
+                                    <asp:Label ID="lblTypeOfBusiness" runat="server" Text='<%# Eval("TypeOfBusiness") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderText="Amount">
+                                <ItemTemplate>
+                                    <asp:Label ID="lblGiftCardAmount" runat="server" Text='<%# Eval("GiftCardAmount") %>'></asp:Label>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:CommandField DeleteText="Decline" ShowDeleteButton="True" />
+                        </Columns>
+                        <EditRowStyle BackColor="#999999" />
+                        <EmptyDataTemplate>No Record Found</EmptyDataTemplate>
+                        <EmptyDataRowStyle ForeColor="#999999" HorizontalAlign="Center" />
+                        <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                        <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                        <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                        <RowStyle BackColor="#F7F6F3" ForeColor="#333333" CssClass="rows" />
+                        <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+                        <SortedAscendingCellStyle BackColor="#E9E7E2" />
+                        <SortedAscendingHeaderStyle BackColor="#506C8C" />
+                        <SortedDescendingCellStyle BackColor="#FFFDF8" />
+                        <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
+
+                    </asp:GridView>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Button ID="btnAdd" runat="server" Text="Add New Provider" CssClass="btn" />
+                    <asp:Button ID="btnCurrent" runat="server" Text="Current Providers" CssClass="btn" OnClick="btnCurrent_Click" />
+
+                </td>
+            </tr>
+        </table>
+
         <br />
-        <br />
-        <div style="float: left; width: 90%;">
-            <asp:GridView ID="gdvShow" HorizontalAlign="Center" ForeColor="#333333" runat="server" CellPadding="3" GridLines="None" AutoGenerateColumns="False" AllowPaging ="True" OnPageIndexChanging ="gdvShow_PageIndexChanging" DataKeyNames="ProviderID" OnSelectedIndexChanged ="gdvShow_SelectedIndexChanged1" CellSpacing="1">
-               <AlternatingRowStyle BackColor="White" ForeColor="#284775" CssClass="rows" />
-                <Columns>
-                    <asp:BoundField DataField="ProviderID" HeaderText="ProviderID" SortExpression="ProviderID" ReadOnly="True" />
-                    <asp:BoundField DataField="Name" HeaderText="Name" SortExpression="Name" />
-                    <asp:BoundField DataField="Email" HeaderText="Email" SortExpression="Email" />
-                    <asp:BoundField DataField="Type" HeaderText="Type" SortExpression="Type" ReadOnly="True" />
-                    <asp:CommandField ShowSelectButton="True" />
-                </Columns>
-                 <EditRowStyle BackColor="#999999" />
-                 <EmptyDataTemplate>No Record Found</EmptyDataTemplate>  
-                <EmptyDataRowStyle ForeColor ="#999999" HorizontalAlign="Center" />
-                <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
-                <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
-                <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
-                <RowStyle BackColor="#F7F6F3" ForeColor="#333333" CssClass="rows" />
-                <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
-                <SortedAscendingCellStyle BackColor="#E9E7E2" />
-                <SortedAscendingHeaderStyle BackColor="#506C8C" />
-                <SortedDescendingCellStyle BackColor="#FFFDF8" />
-                <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
+        <ajaxToolkit:ModalPopupExtender ID="ModalPopupExtender1" runat="server" TargetControlID="btnCurrent" PopupControlID="divCurrent" CancelControlID="btnClose" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
 
-            </asp:GridView>
-            <br />
-            <br />
-        </div>
-        <br />
-        <br />
-        <asp:Table ID="Table2" runat="server" CellPadding="3" CellSpacing="5" HorizontalAlign ="Center">
-
-            <asp:TableRow>
-                <asp:TableCell>
-                    <asp:Button ID="btnUpdate" runat="server" Text="Update" CssClass="btn" Width="130px" OnClick ="btnUpdate_Click" />
-
-
-                </asp:TableCell>
-                <asp:TableCell>
-                    <asp:Label ID="Label4" runat="server" Text="or" ForeColor="LightGray"></asp:Label>
-
-
-                </asp:TableCell>
-                <asp:TableCell>
-                    <asp:Button ID="btnRemove" runat="server" Text="Remove" Width="130px" CssClass="btn" OnClick="btnRemove_Click" />
-
-
-                </asp:TableCell>
-                <asp:TableCell>
-                    <asp:Label ID="Label3" runat="server" Text="or" ForeColor="LightGray"></asp:Label>
-                </asp:TableCell>
-                <asp:TableCell>
-                    <asp:Button ID="btnAdd" runat="server" Text="Add New Provider" Width="180px" CssClass="btn" OnClick="btnAddProvider_Click" />
-
-
-                </asp:TableCell>
-            </asp:TableRow>
-        </asp:Table>
     </div>
 
 
-    <br />
+
+
+
+
+
     <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePageMethods="True"></asp:ScriptManager>
     <ajaxToolkit:ModalPopupExtender ID="popAdd" runat="server" TargetControlID="btnAdd" PopupControlID="divAdd" CancelControlID="btnCancel" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
-    <ajaxToolkit:ModalPopupExtender ID="popUpdate" runat="server" TargetControlID="btnUpdate" PopupControlID="divUpdate" CancelControlID="btnClose" BackgroundCssClass="modalBackground"></ajaxToolkit:ModalPopupExtender>
-
-
-    <div id="divAdd" class="popup" style="width: 800px;">
+    <div id="divAdd" class="popup">
         <h1>ADD NEW PROVIDER</h1>
-        <asp:Table ID="AddProvider" runat="server" CssClass="table" Width="800px">
+        <asp:Table ID="EditProfile" runat="server" HorizontalAlign="Center">
+
             <asp:TableRow>
                 <asp:TableCell>
-                    <asp:Label ID="lblProviderName" runat="server" class="auto-style1" Text="Provider Name:"></asp:Label>
+                    <asp:Label ID="lblName" runat="server" class="auto-style1" Text="Provider Name:"></asp:Label>
                 </asp:TableCell>
                 <asp:TableCell>
                     <asp:TextBox ID="txtProviderName" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                </asp:TableCell><asp:TableCell>
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ValidationGroup="Provider" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtProviderName" ErrorMessage="*"></asp:RequiredFieldValidator>
-                    <asp:RegularExpressionValidator ValidationGroup="Provider" ForeColor="Red" ID="ProviderNameMessage" runat="server" ControlToValidate="txtProviderName" ValidationExpression="^[a-zA-Z\s']{1,20}$" Text="No more than 30 alphabetic characters " />
-                </asp:TableCell></asp:TableRow><asp:TableRow>
+                    <asp:RequiredFieldValidator ID="NameRequire" ValidationGroup="profile" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtProviderName" ErrorMessage="*"></asp:RequiredFieldValidator>
+                </asp:TableCell>
+            </asp:TableRow>
+            <asp:TableRow>
+                <asp:TableCell ColumnSpan="2">
+                    <asp:RegularExpressionValidator ValidationGroup="profile" ID="FirstNameMessage" runat="server" ForeColor="Red" ControlToValidate="txtProviderName" ValidationExpression="^[a-zA-Z\s']{1,30}$" Text="No more than 30 alphabetic characters" />
+                </asp:TableCell>
+            </asp:TableRow>
+            <asp:TableRow>
                 <asp:TableCell>
-                    <asp:Label ID="lblProviderEmail" runat="server" class="auto-style1" Text="Provider Email:"></asp:Label>
+                    <asp:Label ID="lblEmail" runat="server" class="auto-style1" Text="Email:"></asp:Label>
                 </asp:TableCell><asp:TableCell>
                     <asp:TextBox ID="txtProviderEmail" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                </asp:TableCell><asp:TableCell>
-                    <asp:RequiredFieldValidator ID="RequireddValidator1" ValidationGroup="Provider" ForeColor="Red" runat="server" class="auto-style1" ControlToValidate="txtProviderEmail" ErrorMessage="*"></asp:RequiredFieldValidator>
-                    <asp:RegularExpressionValidator ValidationGroup="Provider" ID="RegularExpressionValidator2" runat="server" ForeColor="Red"
-                        ControlToValidate="txtProviderEmail" ErrorMessage="Please enter corect email, eg. john@example.com"
+                    <asp:RequiredFieldValidator ID="Required" ValidationGroup="profile" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtProviderEmail" ErrorMessage="*"></asp:RequiredFieldValidator>
+                </asp:TableCell>
+            </asp:TableRow>
+            <asp:TableRow>
+                <asp:TableCell ColumnSpan="2">
+                    <asp:RegularExpressionValidator ValidationGroup="profile" ID="RegularExpressionValidator1" runat="server" ForeColor="Red"
+                        ControlToValidate="txtProviderEmail" ErrorMessage="Please enter corect email. For example john@example.com"
                         ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
-                </asp:TableCell></asp:TableRow><asp:TableRow>
+                </asp:TableCell>
+            </asp:TableRow>
+            <asp:TableRow>
                 <asp:TableCell>
                     <asp:Label ID="lblType" runat="server" class="auto-style1" Text="Type of Bussiness:"></asp:Label>
                 </asp:TableCell><asp:TableCell>
@@ -310,85 +405,33 @@
                         <asp:ListItem Value="4">Shopping</asp:ListItem>
                         <asp:ListItem Value="5">Other</asp:ListItem>
                     </asp:DropDownList>
-                </asp:TableCell><asp:TableCell>
                     <asp:CompareValidator ID="reqType" runat="server" ControlToValidate="TypeOfBusiness" ErrorMessage="*" ForeColor="Red"
-                        ValueToCompare="0" Operator="NotEqual" ValidationGroup="Provider"></asp:CompareValidator>
-                </asp:TableCell></asp:TableRow><%--<asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="lblAmount" runat="server" class="auto-style1" Text="Amount Provided:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:TextBox ID="txtAmount" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                </asp:TableCell><asp:TableCell>
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ValidationGroup="Provider" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtAmount" ErrorMessage="*"></asp:RequiredFieldValidator>
-                    <asp:CompareValidator ID="comAmount" Text="Enter valid integer" ControlToValidate="txtAmount" Type="Integer" Operator="DataTypeCheck" runat="server" />
-                </asp:TableCell></asp:TableRow>--%><asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="lblpic" runat="server" class="auto-style1" Text="Provider Picture:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:FileUpload ID="Picture" runat="server" />
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator4" ValidationGroup="Provider" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="Picture" ErrorMessage="*"></asp:RequiredFieldValidator>
-                </asp:TableCell></asp:TableRow><asp:TableRow>
-                <asp:TableCell>          
-                </asp:TableCell><asp:TableCell>              
-                </asp:TableCell><asp:TableCell>            
-                </asp:TableCell></asp:TableRow><asp:TableFooterRow>
-                <asp:TableCell>
-                    <asp:Button ID="btnAddProvider" runat="server" class="auto-style6" Text="Add" Width="150px" ValidationGroup="Provider" OnClick="btnAddProvider_Click" CssClass="button"></asp:Button>
-                </asp:TableCell></asp:TableFooterRow></asp:Table><asp:Button ID="btnCancel" runat="server" Text="" CssClass="btn-close" Style="background-image: url('http://icons.iconarchive.com/icons/iconsmind/outline/24/Close-icon.png'); background-repeat: no-repeat" />
-
-    </div>
-    <div id="divUpdate" class="popup" style="width: 800px; height: 700px">
-        <h1>UPDATE PROVIDER</h1><asp:Table ID="updateprovider" runat="server" CssClass="table" Width="800px">
+                        ValueToCompare="0" Operator="NotEqual" ValidationGroup="profile"></asp:CompareValidator>
+                </asp:TableCell>
+            </asp:TableRow>
             <asp:TableRow>
                 <asp:TableCell>
-                    <asp:Label ID="lblprovider" runat="server" class="auto-style1" Text="Provider Name:"></asp:Label>
                 </asp:TableCell><asp:TableCell>
-                    <asp:TextBox ID="txtprovider" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                </asp:TableCell><asp:TableCell>
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator3" ValidationGroup="provider" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtprovider" ErrorMessage="*"></asp:RequiredFieldValidator>
-                    <asp:RegularExpressionValidator ValidationGroup="provider" ID="Message" runat="server" ForeColor="Red" ControlToValidate="txtprovider" ValidationExpression="^[a-zA-Z\s']{1,20}$" Text="No more than 30 alphabetic characters " />
-                </asp:TableCell></asp:TableRow><asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="lblPEmail" runat="server" class="auto-style1" Text="Provider Email:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:TextBox ID="txtPEmail" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                </asp:TableCell><asp:TableCell>
-                    <asp:RequiredFieldValidator ID="RequireddValidator4" ValidationGroup="provider" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtPEmail" ErrorMessage="*"></asp:RequiredFieldValidator>
-                    <asp:RegularExpressionValidator ValidationGroup="provider" ID="RegularExpressionValidator3" runat="server" ForeColor="Red"
-                        ControlToValidate="txtPEmail" ErrorMessage="Please enter corect email, eg. john@example.com"
-                        ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
-                </asp:TableCell></asp:TableRow><asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="Type" runat="server" class="auto-style1" Text="Type of Bussiness:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:DropDownList ID="Bussiness" runat="server" Width="200px" CssClass="textbox">
-                        <asp:ListItem Value="0">Choose a type</asp:ListItem>
-                        <asp:ListItem Value="1">Restaurant</asp:ListItem>
-                        <asp:ListItem Value="2">Lodging</asp:ListItem>
-                        <asp:ListItem Value="3">Clothing</asp:ListItem>
-                         <asp:ListItem Value="4">Shopping</asp:ListItem>
-                        <asp:ListItem Value="5">Other</asp:ListItem>
-                    </asp:DropDownList>
-                </asp:TableCell><asp:TableCell>
-                    <asp:CompareValidator ID="reqTB" runat="server" ControlToValidate="Bussiness" ErrorMessage="*" ForeColor="Red"
-                        ValueToCompare="0" Operator="NotEqual" ValidationGroup="provider"></asp:CompareValidator>
-                </asp:TableCell></asp:TableRow><%--<asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="Amount" runat="server" class="auto-style1" Text="Amount Provided:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:TextBox ID="txtAmountProvide" runat="server" CssClass="textbox" Width="200px"></asp:TextBox>
-                </asp:TableCell><asp:TableCell>
-                    <asp:RequiredFieldValidator ID="RequiredFieldValidator5" ValidationGroup="provider" runat="server" class="auto-style1" ForeColor="Red" ControlToValidate="txtAmountProvide" ErrorMessage="*"></asp:RequiredFieldValidator>
-                    <asp:CompareValidator ID="comamountprovide" Text="Enter valid integer" ControlToValidate="txtAmountProvide" Type="Integer" Operator="DataTypeCheck" runat="server" />
-                </asp:TableCell></asp:TableRow>--%><asp:TableRow>
-                <asp:TableCell>
-                    <asp:Label ID="lblPicture" runat="server" class="auto-style1" Text="Provider Picture:"></asp:Label>
-                </asp:TableCell><asp:TableCell>
-                    <asp:FileUpload ID="Photo" runat="server" />
-                </asp:TableCell></asp:TableRow></asp:Table><br />
-        <asp:Image ID="ProfilePicture" runat="server" Height="231px" Style="margin-left: 72px" Width="260px" /><br />
-        <asp:Button ID="btnUpdateProvider" runat="server" class="auto-style6" Text="Update" Width="20%" ValidationGroup="provider" OnClick="btnUpdateProvider_Click" CssClass="button"></asp:Button>
-        <asp:Button ID="btnDelete" runat="server" CausesValidation="false" Text="Delete" OnClick="btnRemove_Click" CssClass="button" Width="20%"></asp:Button>
+                    <asp:Button ID="btnAddNew" runat="server" ValidationGroup="profile" Text="Add" CssClass="button" OnClick="btnAddNew_Click" />
+                </asp:TableCell>
+            </asp:TableRow>
+        </asp:Table>
+        <asp:Button ID="btnCancel" runat="server" Text="" CssClass="btn-close" Style="background-image: url('http://icons.iconarchive.com/icons/iconsmind/outline/24/Close-icon.png'); background-repeat: no-repeat" />
+    </div>
+    <div id="divCurrent" class="popup">
+        <asp:GridView ID="CurrentProvider" runat="server" CellPadding="4" ForeColor="#333333" GridLines="None">
+            <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+            <EditRowStyle BackColor="#999999" />
+            <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+            <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+            <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+            <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
+            <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+            <SortedAscendingCellStyle BackColor="#E9E7E2" />
+            <SortedAscendingHeaderStyle BackColor="#506C8C" />
+            <SortedDescendingCellStyle BackColor="#FFFDF8" />
+            <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
+        </asp:GridView>
         <asp:Button ID="btnClose" runat="server" Text="" CssClass="btn-close" Style="background-image: url('http://icons.iconarchive.com/icons/iconsmind/outline/24/Close-icon.png'); background-repeat: no-repeat" />
 
     </div>

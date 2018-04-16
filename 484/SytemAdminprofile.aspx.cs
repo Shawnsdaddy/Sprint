@@ -17,90 +17,11 @@ public partial class SytemAdminprofile : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
-        HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        HttpContext.Current.Response.AddHeader("Pragma", "no-cache");
-        HttpContext.Current.Response.AddHeader("Expires", "0");
-
+      
         if (Session["loggedIn"] == null)
         {
             Response.Redirect("default.aspx");
         }
-        switch (Session["Privilege"].ToString())
-        {
-            case "Administrative":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-                    case "ProviderInfor":
-                        Response.Redirect("CEO_AddProvider.aspx");
-                        break;
-                    case "EmployeeInfor":
-                        Response.Redirect("CreateEmployee.aspx");
-                        break;
-                    case "ViewReport":
-                        Response.Redirect("Report.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("CEOprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-
-                }
-                break;
-            case "SystemAdmin":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("SytemAdminprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-
-                }
-                break;
-            case "Employee":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                    case "GetReward":
-                        Response.Redirect("CashOut.aspx");
-                        break;
-                    case "DashBoard":
-                        Response.Redirect("UserDashboard.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("EmployeeProfile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                }
-                break;
-            case "RewardProvider":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("Providerprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("RewardProvider.aspx");
-                        break;
-                }
-                break;
-            default:
                 string name = Session["FirstName"].ToString() + " " + Session["Middle"].ToString() + " " + Session["last"].ToString();
                 lblFullName.Text = name;
                 lblName.Text = name + "'s Profile";
@@ -130,11 +51,7 @@ public partial class SytemAdminprofile : System.Web.UI.Page
 
                     }
                     sc.Close();
-                }
-                break;
-        }
-
-                
+                }              
     }
 
     protected void btnChangePassword_Click(object sender, EventArgs e)
@@ -150,9 +67,11 @@ public partial class SytemAdminprofile : System.Web.UI.Page
             sc.Open();
             SqlCommand insert = new SqlCommand();
             insert.Connection = sc;
-            insert.CommandText = "UPDATE [dbo].[Person] SET [Password] = @Password  where PersonID = @ID";
+            insert.CommandText = "UPDATE [dbo].[Person] SET [Password] = @Password,[LastUpdated]=@lasted,[LastUpdatedBy]=@updatedby  where PersonID = @ID";
             insert.Parameters.AddWithValue("@Password", passwordHashNew);
             insert.Parameters.AddWithValue("@ID", Session["ID"].ToString());
+            insert .Parameters.AddWithValue("@lasted", DateTime.Now.ToShortDateString());
+            insert.Parameters.AddWithValue("@updatedby", Session["loggedIn"]);
             insert.ExecuteNonQuery();
             Response.Write("<script>alert('Password changed successfully')</script>");
             Send_Mail(Session["E-Mail"].ToString(), "Your login password is here: " + password);
@@ -242,8 +161,9 @@ public partial class SytemAdminprofile : System.Web.UI.Page
 
                 SqlCommand cmd = new SqlCommand();
                 cmd.Connection = sc;
-                cmd.CommandText = "UPDATE [dbo].[Person] SET [ProfilePicture] = @ProfilePicture WHERE PersonID=@id";
-
+                cmd.CommandText = "UPDATE [dbo].[Person] SET [ProfilePicture] = @ProfilePicture,[LastUpdated] = @LastUpdated,[LastUpdatedBy] = @LastUpdatedBy WHERE PersonID=@id";
+                cmd.Parameters.AddWithValue("@LastUpdatedBy", Session["loggedIn"].ToString());
+                cmd.Parameters.AddWithValue("@LastUpdated", DateTime.Now.ToShortDateString());
                 cmd.Parameters.AddWithValue("@ProfilePicture", bytes);
                 cmd.Parameters.AddWithValue("@id", Session["ID"]);
                 cmd.ExecuteNonQuery();
@@ -315,10 +235,12 @@ public partial class SytemAdminprofile : System.Web.UI.Page
         sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
         sc.Open();
 
-        string sql = " update [dbo].[Person] set [DefaultPage] = @page where PersonID=@personID";
+        string sql = " update [dbo].[Person] set [DefaultPage] = @page,[LastUpdated] = @LastUpdated,[LastUpdatedBy] = @LastUpdatedBy where PersonID=@personID";
         SqlCommand cmd = new SqlCommand(sql, sc);
         cmd.Parameters.AddWithValue("@personID", Session["ID"]);
         cmd.Parameters.AddWithValue("@page", dropPages.SelectedValue.ToString());
+        cmd.Parameters.AddWithValue("@LastUpdatedBy", Session["loggedIn"].ToString());
+        cmd.Parameters.AddWithValue("@LastUpdated", DateTime.Now.ToShortDateString());
         cmd.ExecuteScalar();
         sc.Close();
     }

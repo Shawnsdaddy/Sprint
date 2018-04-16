@@ -17,77 +17,15 @@ public partial class RewardProvider : System.Web.UI.Page
         HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         HttpContext.Current.Response.AddHeader("Pragma", "no-cache");
         HttpContext.Current.Response.AddHeader("Expires", "0");
-
         if (Session["loggedIn"] == null)
         {
             Response.Redirect("default.aspx");
-            Calendar1.VisibleDate = DateTime.Today;
         }
-        switch (Session["Privilege"].ToString())
-        {
-            case "Administrative":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-                    case "ProviderInfor":
-                        Response.Redirect("CEO_AddProvider.aspx");
-                        break;
-                    case "EmployeeInfor":
-                        Response.Redirect("CreateEmployee.aspx");
-                        break;
-                    case "ViewReport":
-                        Response.Redirect("Report.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("CEOprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("CEOPostWall.aspx");
-                        break;
-
-                }
-                break;
-            case "SystemAdmin":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("SytemAdminprofile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("SystemAdmin.aspx");
-                        break;
-
-                }
-                break;
-            case "Employee":
-                switch (Session["DefaultPage"].ToString())
-                {
-                    case "Homepage":
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                    case "GetReward":
-                        Response.Redirect("CashOut.aspx");
-                        break;
-                    case "DashBoard":
-                        Response.Redirect("UserDashboard.aspx");
-                        break;
-                    case "Setting":
-                        Response.Redirect("EmployeeProfile.aspx");
-                        break;
-                    default:
-                        Response.Redirect("EmployeeReward.aspx");
-                        break;
-                }
-                break;
-            default:
-                lblPoints.Text = "Welcome, " + Session["JobTitle"] + "!";
-                break;
-        }
+       
+                lblPoints.Text = "Welcome, " + Session["ProviderName"] + "!";
+        Calendar1.VisibleDate = DateTime.Today;
+        displayCompanyGrid();
+        Session["BusinessEntityID"] = null;
 
     }
     protected void Calendar1_DayRender(object sender, DayRenderEventArgs e)
@@ -119,28 +57,37 @@ public partial class RewardProvider : System.Web.UI.Page
     }
     protected void btnAddNew_Click(object sender, EventArgs e)
     {
+
         try
         {
-            SqlConnection sc = new SqlConnection();
-            sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
-            sc.Open();
+            if (Session["BusinessEntityID"] != null)
+            {
+                SqlConnection sc = new SqlConnection();
+                sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+                sc.Open();
+                SqlCommand insertIntoCalendar = new SqlCommand("INSERT INTO [dbo].[Calendar] ([ProviderID] ,[EventName] ,[Date] ,[Location] ,[LastUpdated] ,[LastUpdatedBy] ,[BusinessEntityID]) " +
+                    "VALUES (@PersonID, @EventName, @Date, @Location, @LastUpdated, @LastUpdatedBy, @BusinessEntityID)");
+                insertIntoCalendar.Connection = sc;
+                insertIntoCalendar.Parameters.AddWithValue("@PersonID", Session["ID"].ToString());
+                insertIntoCalendar.Parameters.AddWithValue("@EventName", txtEventName.Text);
+                var time = Convert.ToDateTime(txtTime.Text);
+                string Time = time.ToString("hh:mm:ss");
+                DateTime datetime = DateTime.Parse(txtDate.Text + " " + Time);
+                insertIntoCalendar.Parameters.AddWithValue("@Date", datetime);
+                insertIntoCalendar.Parameters.AddWithValue("@Location", txtStreet.Text + " "+ txtCity.Text + ", " + drpState.SelectedValue + " " + txtZip.Text);
+                insertIntoCalendar.Parameters.AddWithValue("@LastUpdated", DateTime.Now);
+                insertIntoCalendar.Parameters.AddWithValue("@LastUpdatedBy", Session["ProviderName"]);
+                insertIntoCalendar.Parameters.AddWithValue("@BusinessEntityID", Session["BusinessEntityID"]);
+                insertIntoCalendar.ExecuteNonQuery();
 
-
-            SqlCommand insertIntoCalendar = new SqlCommand("INSERT INTO [dbo].[Calendar] ([PersonID],[EventName],[Date],[Location],[LastUpdated],[LastUpdatedBy]) VALUES " +
-               "(@PersonID, @EventName, @Date, @Location, @LastUpdated, @LastUpdatedBy)");
-            insertIntoCalendar.Connection = sc;
-            insertIntoCalendar.Parameters.AddWithValue("@PersonID", Session["ID"].ToString());
-            insertIntoCalendar.Parameters.AddWithValue("@EventName", txtEventName.Text);
-            var time = Convert.ToDateTime(txtTime.Text);
-            string Time = time.ToString("hh:mm:ss");
-            DateTime datetime = DateTime.Parse(txtDate.Text + " " + Time);
-            insertIntoCalendar.Parameters.AddWithValue("@Date", datetime);
-            insertIntoCalendar.Parameters.AddWithValue("Location", txtStreet.Text + txtCity.Text + ", " + drpState.SelectedValue + " "+txtZip.Text);
-            insertIntoCalendar.Parameters.AddWithValue("LastUpdated", DateTime.Now);
-            insertIntoCalendar.Parameters.AddWithValue("LastUpdatedBy", Session["JobTitle"]);
-            insertIntoCalendar.ExecuteNonQuery();
-
-            Response.Write("<script>alert('New Event added successfully! ')</script>");
+                Response.Write("<script>alert('New Event added successfully! ')</script>");
+                
+            }
+            else
+            {
+                Response.Write("<script>alert('Please Choose a Business Enity ')</script>");
+                popSelectCompany.Show();
+            }
         }
         catch
         {
@@ -161,5 +108,70 @@ public partial class RewardProvider : System.Web.UI.Page
         txtCity.Text = "Harrisonburg";
         txtZip.Text = "22807";
         drpState.SelectedValue = "VA";
+        popUpdate.Show();
+    }
+
+    protected void displayCompanyGrid()
+    {
+        SqlConnection sc = new SqlConnection();
+        sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+        sc.Open();
+
+        SqlCommand selectCompany = new SqlCommand("Select BusinessEntityID, BusinessEntityName, BusinessEntityEmail From BusinessEntity where BusinessEntityID in (select BusinessEntityID from [ProviderRewards] where ProviderID = @ProviderID)");
+        selectCompany.Parameters.AddWithValue("@ProviderID", Session["ID"]);
+        selectCompany.Connection = sc;
+        //selectCompany.ExecuteNonQuery();
+        SqlDataAdapter adptr = new SqlDataAdapter(selectCompany);
+        DataTable dtb = new DataTable();
+        adptr.Fill(dtb);
+        CompanyGrid.DataSource = dtb;
+        CompanyGrid.DataBind();
+    }
+
+    protected void BtnContinuetoAdd_Click(object sender, EventArgs e)
+    {
+        if (Session["BusinessEntityID"] != null){
+            SqlConnection sc = new SqlConnection();
+            sc.ConnectionString = ConfigurationManager.ConnectionStrings["GroupProjectConnectionString"].ConnectionString;
+            sc.Open();
+            SqlCommand insertIntoCalendar = new SqlCommand("INSERT INTO [dbo].[Calendar] ([ProviderID] ,[EventName] ,[Date] ,[Location] ,[LastUpdated] ,[LastUpdatedBy] ,[BusinessEntityID]) " +
+                "VALUES (@PersonID, @EventName, @Date, @Location, @LastUpdated, @LastUpdatedBy, @BusinessEntityID)");
+            insertIntoCalendar.Connection = sc;
+            insertIntoCalendar.Parameters.AddWithValue("@PersonID", Session["ID"].ToString());
+            insertIntoCalendar.Parameters.AddWithValue("@EventName", txtEventName.Text);
+            var time = Convert.ToDateTime(txtTime.Text);
+            string Time = time.ToString("hh:mm:ss");
+            DateTime datetime = DateTime.Parse(txtDate.Text + " " + Time);
+            insertIntoCalendar.Parameters.AddWithValue("@Date", datetime);
+            insertIntoCalendar.Parameters.AddWithValue("@Location", txtStreet.Text + txtCity.Text + ", " + drpState.SelectedValue + " " + txtZip.Text);
+            insertIntoCalendar.Parameters.AddWithValue("@LastUpdated", DateTime.Now);
+            insertIntoCalendar.Parameters.AddWithValue("@LastUpdatedBy", Session["ProviderName"]);
+            insertIntoCalendar.Parameters.AddWithValue("@BusinessEntityID", Session["BusinessEntityID"]);
+            insertIntoCalendar.ExecuteNonQuery();
+        }
+        else
+        {
+            Response.Write("<script>alert('Please Choose a Business Enity ')</script>");
+            popSelectCompany.Show();
+        }
+
+    }
+
+    protected void CompanyGrid_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        Session["BusinessEntityID"] = CompanyGrid.SelectedRow.Cells[0].Text;
+        popSelectCompany.Show();
+    }
+
+    protected void btnEvent_Click(object sender, EventArgs e)
+    {
+        displayCompanyGrid();
+    }
+
+
+    protected void CompanyGrid_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        gvEvents.PageIndex = e.NewPageIndex;
+        this.displayCompanyGrid();
     }
 }
