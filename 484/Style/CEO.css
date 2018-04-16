@@ -8,12 +8,17 @@ h1 {
 .txt {
     color:aliceblue;
     font-size:20px;
+    margin:8px 0px 8px 0px;
+    display:inline-block;
+
 }
 
 .btn-aligncenter {
     text-align: center;
     border-bottom: 1px solid #C7CDD1;
 }
+.newsfeed{
+} 
 
 .table {
     font-family: 'Raleway', sans-serif;
@@ -43,11 +48,8 @@ h1 {
 
 body, p {
     font-family: 'Raleway', sans-serif;
-    width: 50%;
-    margin-top: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-right: auto;
+    width: 80%;
+    float:right;
     background-color: #ffffff;
 }
 
@@ -169,8 +171,7 @@ body, p {
 .btn-login {
     color: #fff;
     background-color: #E12D53;
-    margin-left: 50px;
-    margin-right: auto;
+    margin: auto;
     padding:4px;
     display: block;
     margin-bottom: 10px;
@@ -266,7 +267,7 @@ body, p {
 .sidenav {
     font-family: 'Raleway', sans-serif;
     height: 100%; /* 100% Full-height */
-    width: 175px; /* 0 width - change this with JavaScript */
+    width: 15%; /* 0 width - change this with JavaScript */
     position: fixed; /* Stay in place */
     z-index: 1; /* Stay on top */
     top: 0; /* Stay at the top */
@@ -279,13 +280,15 @@ body, p {
 
     /* The navigation menu links */
     .sidenav a {
+        text-align: center;
         font-family: 'Raleway', sans-serif;
-        padding: 8px 8px 8px 32px;
+        padding: 8px 8px 8px 8px;
         text-decoration: none;
         font-size: 18px;
         color: #FFFFFF;
         display: block;
         transition: 0.3s;
+        line-height: 50px;
     }
 
         /* When you mouse over the navigation links, change their color */
@@ -305,8 +308,10 @@ body, p {
 /*Style page content - use this if you want to push the page content to the right when you open the side navigation*/
 #main {
     font-family: 'Raleway', sans-serif;
-    transition: margin-left .5s;
+    /*transition: margin-left .5s;*/
     padding: 20px;
+    margin-right:5%;
+    
 }
 
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
@@ -420,8 +425,8 @@ body, p {
     padding: 20px;
     background: #fff;
     border-radius: 5px;
-    width: 46%;
-    position: absolute;
+    /*width: 46%;*/
+    position:absolute;
     transition: all 5s ease-in-out;
     /*top: 0px;
     left: 0px;*/
@@ -557,7 +562,7 @@ article {
 }
 
 .card-title {
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Times New Roman', sans-serif;
     font-weight: 700;
     padding: 2px;
     color: #17468A;
@@ -630,3 +635,111 @@ article {
   margin: 0px;
   z-index:1000000 !important;
 }
+#popup {
+    position:center;
+    /*top: 40px;*/ /* Set to 0 or wherever */
+    width: 40%; /* set to 100% if space is available */
+    z-index: 105;
+    text-align: center;
+    font-weight: normal;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    background-color: lightcoral;
+    padding: 5px;
+    left: 20%;
+}
+
+#content {
+    padding: 5px;
+    -moz-border-radius: 10px;
+    text-align: center
+}
+
+#popup span.dismiss {
+    border: 2px solid #FFF;
+    padding: 0 5px;
+    cursor: pointer;
+    float: right;
+    margin-right: 10px;
+}
+
+@media screen and (max-width: 480px) {
+    #main {
+        width: auto;
+        padding:0px;
+    }
+}
+
+@media screen and (min-width:481px) and (max-width: 1023px) {
+    .txt{
+        font-size:small;
+    }
+
+    .sidenav {
+
+        width: 120px; /* 0 width - change this with JavaScript */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Stay on top */
+        overflow-x: hidden; /* Disable horizontal scroll */
+        padding-top: 15px; /* Place content 60px from the top */
+        transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+       
+    }
+    #main {
+        font-family: 'Raleway', sans-serif;
+        transition: margin-left .5s;
+        padding: 10px;
+        margin-right:0;
+        width:auto;
+    }
+    .sidenav a {
+        text-align:center;
+        font-size: 12px;
+        padding: 2px 2px 2px 2px;
+        line-height:35px;
+    }
+
+    .card-content {
+        padding: 0.5em 0.5em 0.5em 0.5em;
+        margin: 0;
+        padding-bottom: 0;
+        margin-left: .05em;
+        border-bottom: groove;
+    }
+
+    .card-title {
+        padding: 2px;
+        color: #17468A;
+        text-align: left;
+        font-size: 16px;
+    }
+
+
+            .card-title a:hover {
+                color: #66cccc;
+                text-decoration: none;
+            }
+
+    .card-body {
+        margin:0;
+        text-align:right;
+        padding-bottom: 0; 
+        float:right;
+        display:inline-block;
+        width:auto;
+    }
+
+    .card-time {
+        font-family: 'Raleway', sans-serif;
+        color: cadetblue;
+        Background: transparent;
+        padding-bottom: 1.5em;
+        margin-right: 20px;
+        margin-left:0;
+        
+    }
+
+}
+
+

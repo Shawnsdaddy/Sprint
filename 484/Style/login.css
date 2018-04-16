@@ -1,19 +1,37 @@
-﻿
+﻿.transparent{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 360px;
+    height: 300px;
+    padding: 80px 40px;
+    box-sizing: border-box;
+    /*background: rgba(0,0,0,.5);*/
+}
+.user {
+    width: 100px;
+    height: 100px;
+    border-radius: 100%;
+    overflow: hidden;
+    position: absolute;
+    top: calc(-100px/2);
+    left: calc(50% - 50px);
+}
 table {
     width: 600px;
-    margin-top: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
 }
-
+.popuptable {
+    font-family: 'Raleway', sans-serif;
+    width: 900px;
+    margin: auto;
+    color: #333
+}
 .table {
     font-family: 'Raleway', sans-serif;
     width: 900px;
-    margin-top: auto;
-    margin-bottom: auto;
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
     color: #333
 }
 
@@ -37,18 +55,21 @@ body {
 
 .td {
     font-family: 'Raleway', sans-serif;
+    margin-left:63px;
+  
+
 }
 
 .btn-login {
     color: #fff;
-    background-color: #4C8DCA;
-    border-color: #4C8DCA;
-    margin-left: auto;
-    margin-right: auto;
+    background-color: #83CBE8;
+    border-color: #78E5EB;
+    margin-left: 8%;
+    /*margin-right: auto;*/
     display: block;
-    width: 35%;
+    width: 30%;
     height: 15%;
-    margin-bottom: 30px;
+    margin-top: 40px;
     font-weight: normal;
     text-align: center;
     white-space: nowrap;
@@ -90,14 +111,12 @@ body {
 
 .btn-forgot {
     color: #fff;
-    background-color: #83CBE8;
-    border-color: #78E5EB;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    margin-bottom: 10px;
+    /*background-color: #4C8DCA;
+    border-color: #4C8DCA;*/
+    margin-left: 15%;
+    /*display: block;
+    margin-top:30%;
     font-weight: normal;
-    text-align: center;
     white-space: nowrap;
     vertical-align: middle;
     -webkit-user-select: none;
@@ -111,6 +130,8 @@ body {
     border-radius: 0.25rem;
     transition: all 0.15s ease-in-out;
     font-size: small;
+    width: 10%;
+    height: 20%;*/
 }
 
     .btn-forgot:hover {
@@ -140,13 +161,26 @@ body {
 .textbox {
     font-family: 'Raleway', sans-serif;
     height: 10%;
-    width: 30%;
+    width: 40%;
     padding: 5px 5px 5px 5px;
     border-radius: 25px;
     border: 2px solid #17468A;
     margin: 2%;
-}
+    
 
+
+}
+.popuptextbox {
+    font-family: 'Raleway', sans-serif;
+    height: 10%;
+    width: 100%;
+    padding: 5px 5px 5px 5px;
+    border-radius: 25px;
+    border: 2px solid #17468A;
+    margin: 2%;
+
+  
+}
 .loginLabel {
     font-family: 'Raleway', sans-serif;
     height: 10%;
@@ -232,6 +266,7 @@ h6 {
     width: 30%;
     position: relative;
     transition: all 5s ease-in-out;
+    width: 300px;
 }
 
     .popup h2 {
@@ -276,3 +311,79 @@ h6 {
     .button:hover {
         background: #06D85F;
     }
+.Login1 {
+    width: 600px;
+    margin: auto;
+    align-content: center;
+}
+
+
+@media screen and (max-width: 480px) {
+    table {
+        width: 100%;
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .textbox {
+        font-family: 'Raleway', sans-serif;
+        height: auto;
+        width: 65%;
+        padding: 5px 5px 5px 5px;
+        border-radius: 25px;
+        border: 2px solid #17468A; 
+        margin: auto;
+        font-size:smaller;
+    }
+
+    .Login1 {
+        width: 90%;
+        margin: auto;
+        align-content: center;
+    }
+    .rewardIcon {
+        width: 45%;
+        height:45%;
+        margin:auto;
+    }
+    .btn-login {
+        width: 60%;   
+    }
+    .btn-forgot {
+        width: 40%;
+        font-size:xx-small;
+    }
+
+    .popup {
+        margin: auto;
+        border-radius: 5px;
+        width: 80%;
+    }
+    .popuptable {
+        width: 90%;
+    }
+    .popuptextbox {
+        font-family: 'Raleway', sans-serif;
+        padding: 0px;
+        border-radius: 25px;
+        border: 2px solid #17468A;
+        margin: 2%;
+    }
+    
+}
+
+@media screen and (min-width:481px) and (max-width: 1023px) {
+    table {
+        width: 480px;
+        margin: auto;
+    }
+
+    .Login1 {
+        width: 100%;
+        margin: auto;
+        align-content: center;
+    }
+
+}
+
