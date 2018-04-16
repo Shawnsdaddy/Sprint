@@ -42,7 +42,7 @@ public class RedeemReward
     }
 public void setTransactionAmount (double transactionAmount)
     {
-        this.transactionAmount = transactionAmount;
+        this.transactionAmount = this.redeemAmount*this.redeemQuantity;
     }
     public void setlastUpdatedBy(string lastUpdatedBy)
     {

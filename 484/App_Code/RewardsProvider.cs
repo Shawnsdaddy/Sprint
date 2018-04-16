@@ -9,21 +9,17 @@ public class RewardsProvider
     private string companyName;
     private string typeOfBusiness;
     private string email;
-    private int quantity;
     private string LastUpdatedBy;
     private DateTime LastUpdated;
-    private double amountprovided;
-    private int BusinessEntityID;
-    public RewardsProvider(string companyName, string email, string typeOfBusiness, DateTime LastUpdated, string LastUpdatedBy, int BusinessEntityID)
+    //private int amountprovided;
+    public RewardsProvider(string companyName, string email, string typeOfBusiness, DateTime LastUpdated, string LastUpdatedBy)
     {
         setcompnayName(companyName);
         setemail(email);
         settypeOfBusiness(typeOfBusiness);
         setLastUpdated(LastUpdated);
         setLastUpdatedBy(LastUpdatedBy);
-        amountprovided = 20;
-        setBusinessEntityID(BusinessEntityID);
-       
+        //setAmountProvided(amountprovided);  
     }
     public void setcompnayName(string companyname)
     {
@@ -38,11 +34,11 @@ public class RewardsProvider
     {
         this.email = email;
     }
-    //public void setamountProvided(double amountprovided)
+    //public void setAmountProvided(int amountprovided)
     //{
     //    this.amountprovided = amountprovided;
     //}
-    
+
     public string getcompanyName()
     {
         return this.companyName;
@@ -55,10 +51,10 @@ public class RewardsProvider
     {
         return this.email;
     }
-    public double getamountProvided()
-    {
-        return this.amountprovided;
-    }
+    //public double getamountProvided()
+    //{
+    //    return this.amountprovided;
+    //}
     public void setLastUpdatedBy(string lastUpdatedBy)
     {
         this.LastUpdatedBy = lastUpdatedBy;
@@ -74,15 +70,5 @@ public class RewardsProvider
     public DateTime getLastUpdated()
     {
         return this.LastUpdated;
-    }
-
-    public void setBusinessEntityID(int BusinessEntityID)
-    {
-        this.BusinessEntityID = BusinessEntityID;
-    }
-
-    public int getBusinessEntityID()
-    {
-        return this.BusinessEntityID;
     }
 }
